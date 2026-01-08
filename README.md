@@ -2,6 +2,8 @@
 The project is dedicated for developing a web-based platform for real-time vocal pitch monitoring, using signal processing and machine learning to make professional vocal training more accessible through objective feedback and personalized coaching.
 
 
+To run the project:
+
 1. This project is recommended to run and edit on IntelliJ IDEA.
 If you don't have IntelliJ IDEA download it
 https://www.jetbrains.com/idea/
