@@ -1,6 +1,8 @@
 # Vocal Pitch Monitor Web Application
 This project is dedicated for developing a web-based platform for real-time vocal pitch monitoring, using signal processing and machine learning to make professional vocal training more accessible through objective feedback and personalized coaching.
 
+* Note that this project is incomplete. more modules to be added
+  
 To run the project:
 
 1. This project is recommended to run and edit on IntelliJ IDEA.
