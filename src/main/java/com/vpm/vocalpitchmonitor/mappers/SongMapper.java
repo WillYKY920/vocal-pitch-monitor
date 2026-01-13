@@ -1,10 +1,12 @@
 package com.vpm.vocalpitchmonitor.mappers;
 
 import com.vpm.vocalpitchmonitor.DTOs.ArtistResponseDto;
+import com.vpm.vocalpitchmonitor.DTOs.LyricsResponseDto;
 import com.vpm.vocalpitchmonitor.DTOs.SongDto;
 import com.vpm.vocalpitchmonitor.DTOs.SongResponseDto;
 import com.vpm.vocalpitchmonitor.entities.Artist;
 import com.vpm.vocalpitchmonitor.entities.Song;
+import com.vpm.vocalpitchmonitor.entities.SyncedLyrics;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

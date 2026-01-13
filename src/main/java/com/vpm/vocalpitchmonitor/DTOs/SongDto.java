@@ -6,9 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 public record SongDto(
 
-    @NotEmpty String title,
+    @NotEmpty String title, // length is evaluated
 
-    String artist,
+    @NotEmpty String artist,
 
     @NotEmpty String duration
 ){

@@ -1,8 +1,6 @@
 package com.vpm.vocalpitchmonitor.services;
 
-import com.vpm.vocalpitchmonitor.DTOs.AudiotrackResponseDto;
 import com.vpm.vocalpitchmonitor.entities.Audiotrack;
-import com.vpm.vocalpitchmonitor.repositories.AudiotrackRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,19 +12,16 @@ import java.io.OutputStream;
 @Service
 public class StreamService {
 
-    private final AudiotrackRepository audiotrackRepository;
-
-    private final TrackService trackService;
+    private final SongManagementService songManagementService;
 
     @Autowired
-    public StreamService(AudiotrackRepository audiotrackRepository, TrackService trackService) {
-        this.audiotrackRepository = audiotrackRepository;
-        this.trackService = trackService;
+    public StreamService(SongManagementService songManagementService) {
+        this.songManagementService = songManagementService;
     }
 
-    public void streamAudio(HttpServletResponse response, int id) throws IOException {
+    public void streamAudio(HttpServletResponse response, int songId) throws IOException {
 
-        Audiotrack audiotrack = trackService.getAudiotrackById(id);
+        Audiotrack audiotrack = songManagementService.findAudioTrackBySongId(songId);
 
         response.setContentType(audiotrack.getContentType());
         response.setContentLengthLong(audiotrack.getByteSize());
@@ -40,4 +35,6 @@ public class StreamService {
         }
 
     }
+
+
 }

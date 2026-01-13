@@ -4,6 +4,7 @@ import com.vpm.vocalpitchmonitor.DTOs.AudiotrackResponseDto;
 import com.vpm.vocalpitchmonitor.services.StreamService;
 import com.vpm.vocalpitchmonitor.services.TrackService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,15 +26,12 @@ public class StreamController {
         this.trackService = trackService;
     }
 
-
-
     @GetMapping("/play/{song_id}")
     public void playAudio(
-            @PathVariable("song_id") int id, HttpServletResponse response) throws IOException {
+            @PathVariable("song_id") @Valid int songId, HttpServletResponse response) throws IOException {
 
-            CURRENTLY_PLAYING_ID = id;
-            streamService.streamAudio(response, id);
-
+            CURRENTLY_PLAYING_ID = songId;
+            streamService.streamAudio(response, songId);
     }
 
     @GetMapping("/play/info")

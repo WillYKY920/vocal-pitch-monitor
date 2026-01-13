@@ -1,10 +1,11 @@
 package com.vpm.vocalpitchmonitor.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.vpm.vocalpitchmonitor.utils.LRCParser;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "song")
@@ -26,7 +27,7 @@ public class Song { // metadata
 
     @JsonProperty("lyrics")
     @OneToOne(mappedBy = "song", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Lyrics lyrics;
+    private SyncedLyrics lyrics;
 
     @JsonProperty("vocal-track")
     @OneToOne(mappedBy = "song", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -37,7 +38,7 @@ public class Song { // metadata
     private Audiotrack audiotrack;
 
 
-    public Song(){} // No argument constructor
+    public Song() {} // No argument constructor
 
     public Song(Artist artist, String title, int duration) {
         this.artist = artist;
@@ -48,7 +49,6 @@ public class Song { // metadata
     public Artist getArtist() {
         return artist;
     }
-
     public void setArtist(Artist artist) {
         this.artist = artist;
     }
@@ -56,7 +56,6 @@ public class Song { // metadata
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
@@ -64,23 +63,16 @@ public class Song { // metadata
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
 
-    public Lyrics getLyrics() {
-        return lyrics;
-    }
-
-    public void setLyrics(Lyrics lyrics) {
-        this.lyrics = lyrics;
-    }
+    public SyncedLyrics getLyrics() {return lyrics;}
+    public void setLyrics(SyncedLyrics lyrics) {this.lyrics = lyrics;}
 
     public Vocaltrack getVocaltrack() {
         return vocaltrack;
     }
-
     public void setVocaltrack(Vocaltrack vocaltrack) {
         this.vocaltrack = vocaltrack;
     }
@@ -88,16 +80,13 @@ public class Song { // metadata
     public Audiotrack getAudiotrack() {
         return audiotrack;
     }
-
     public void setAudiotrack(Audiotrack audiotrack) {
         this.audiotrack = audiotrack;
     }
 
     public int getDuration(){return this.duration;}
-
     public void setDuration(String duration) {
-
-        String[] parts = duration.split(":"); // min:sec
-        this.duration =  Integer.parseInt(parts[0]) * 60 + Integer.parseInt(parts[1]);
+        System.out.println(duration);
+        this.duration = LRCParser.toMilliseconds(duration);
     }
 }
