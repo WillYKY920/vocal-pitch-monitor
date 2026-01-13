@@ -64,7 +64,8 @@ public class LRCParser {
         }
     }
 
-    public static List<Integer> getTimestamps(String line) { // [**:**.**]
+    // [**:**.**]
+    public static List<Integer> getTimestamps(String line) {
 
         List<Integer> timestamps = new ArrayList<>();
         Matcher matcher = TIME_PATTERN.matcher(line);
@@ -82,6 +83,7 @@ public class LRCParser {
         return timestamps;
     }
 
+    // [<key>:<value>]
     public static void setMetadata(Container container, String line) {
 
         Matcher matcher = METADATA_PATTERN.matcher(line);
@@ -113,8 +115,6 @@ public class LRCParser {
         double seconds = Double.parseDouble(parts[1]);
         return (int)((minutes * 60 + seconds) * 1000);
     }
-
-// This also works for "03:35.88"
 
     @Data
     private static class Container {

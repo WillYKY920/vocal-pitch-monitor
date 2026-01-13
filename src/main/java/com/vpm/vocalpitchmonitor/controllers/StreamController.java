@@ -25,7 +25,9 @@ public class StreamController {
         this.streamService = streamService;
         this.trackService = trackService;
     }
-
+    /*
+    http://localhost:8080/play/{song_id}
+    */
     @GetMapping("/play/{song_id}")
     public void playAudio(
             @PathVariable("song_id") @Valid int songId, HttpServletResponse response) throws IOException {
@@ -33,7 +35,9 @@ public class StreamController {
             CURRENTLY_PLAYING_ID = songId;
             streamService.streamAudio(response, songId);
     }
-
+    /*
+   http://localhost:8080/play/info
+   */
     @GetMapping("/play/info")
     public AudiotrackResponseDto getAudioInfo() {
         if (CURRENTLY_PLAYING_ID == null) {
