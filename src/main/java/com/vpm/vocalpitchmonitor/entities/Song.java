@@ -26,15 +26,15 @@ public class Song { // metadata
     private int duration;
 
     @JsonProperty("lyrics")
-    @OneToOne(mappedBy = "song", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "song", cascade = CascadeType.ALL)
     private SyncedLyrics lyrics;
 
     @JsonProperty("vocal-track")
-    @OneToOne(mappedBy = "song", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "song", cascade = CascadeType.ALL)
     private Vocaltrack vocaltrack;
 
     @JsonProperty("audio-track")
-    @OneToOne(mappedBy = "song", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "song", cascade = CascadeType.ALL)
     private Audiotrack audiotrack;
 
 

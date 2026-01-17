@@ -1,0 +1,83 @@
+geneate a Web UI using Html and the html should include 4 components:
+1. songs selection and player
+2. audio frequency visualizer
+3. synced lyrics display
+4. pitch graph visualizer (just build the outline)
+
+for placement i want the
+pitch graph visalizer at the top
+song play at the bottom left corner and and the song selction right on top of the song player but in the same frame
+the synced lyrics display placed at the bottom right corner and the audio frequency visualizer right on top of the lyrics display but in the same frame
+
+do not give me any js / ts code yet just give me the outline
+
+make the UI fits into one screen without needing to scroll down
+for the song selection make the artist list and songs list into 2 columns with n rows but only shows 5 at default, only shows more when the user scrolls down.
+when clicking on the artist a selected artist, update the songs list which performed by current selected artist
+when clicking on the songs, selects a song to play and update the song player track that is now playing
+
+Now implement the functions using JavaScript/TypeScript
+For the song selection:
+the default state should be no artist and song is selected likewise with the song player.
+the progress bar should show the play time and indicate how long the song has been played and the timeline should be adjustable
+here is the json format for returning a list of artists with endpoint http://localhost:8080/artist/all
+{
+    artists: [
+        {
+        name: xxx
+        },
+        {
+        name: xxx
+        }
+        ...]
+}
+when clicking on the artist a selected artist, this sends a GET request with artist name selected as path variable
+endpoint: http://localhost:8080/artist/{name}
+then update the songs list with current artist's songs (return a list of song in Json)
+the song lists should show the song duration at the left corner
+{
+    artists: xxx,
+    songs: [
+        {
+           "id" : int,
+          "title" : xxx,
+          "duration" : int
+        },
+        ...]
+}
+
+when clicking on the songs, this sends a GET request with song id selected as path variable then update the song player title and artist and audiotrack
+endpoint: http://localhost:8080/play/{song-id}
+this returns a audio stream file eg. wav/mp3
+
+    http://localhost:8080/play/{song_id}
+
+    @GetMapping("/play/{song_id}")
+    public void playAudio(
+            @PathVariable("song_id") @Valid int songId, HttpServletResponse response) throws IOException {
+
+            CURRENTLY_PLAYING_ID = songId;
+            streamService.streamAudio(response, songId);
+    }
+when the play button is clicked, play the song and update the button icon to pause
+finally, add the adjust volume function
+
+For the lyrics selection:
+the default state should not have any lyrics being displayed
+when a song is played, this fetch the song lyrics by sending a GET request with song id as path variable
+endpoint: http://localhost:8080/lyrics/{song-id} and returns
+{
+    lyrics: [
+        {
+        text: xxx
+        timestamp: int // in milliseconds
+        },
+        {
+        text: xxx
+        timestamp: int // in milliseconds
+        },
+        ...]
+}
+the lyrics should be synced with the song play time
+that's all is needed for now, write me the functions in differe js/ts file seperated by the components
+

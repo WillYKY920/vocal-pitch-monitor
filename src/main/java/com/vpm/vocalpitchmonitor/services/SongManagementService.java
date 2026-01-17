@@ -120,6 +120,17 @@ public class SongManagementService {
                 .collect(Collectors.toList());
     }
 
+    public ArtistListResponseDto findAllArtistNames() {
+
+        return new ArtistListResponseDto(
+                artistRepository.findAll()
+                    .stream()
+                    .map(mapper::artistToString)
+                    .collect(Collectors.toList())
+        );
+
+    }
+
     public List<SongResponseDto> findAllSongs(){
 
         return songRepository.findAll()
@@ -127,7 +138,4 @@ public class SongManagementService {
                 .map(mapper::toSongResponseDto)
                 .collect(Collectors.toList());
     }
-
-
-
 }

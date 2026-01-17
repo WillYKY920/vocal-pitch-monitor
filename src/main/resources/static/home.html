@@ -2,9 +2,108 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Vocal Pitch Monitor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch Detection Monitor</title>
+
+    <link rel="icon" type="image/png" href="images/favicon.png" />
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+<!-- Header -->
+<header>
+    <div class="logo-area">
+        <div class="logo-icon"></div>
+        <span>Pitch Detection Monitor</span>
+    </div>
+    <nav>
+        <a href="#">HOME</a>
+        <a href="test.html">TEST</a>
+        <a href="#">HELP</a>
+        <a href="#">ABOUT US</a>
+    </nav>
+</header>
+
+<!-- Main Content -->
+<main>
+    <!-- Top: Pitch Graph -->
+    <section class="pitch-graph-container">
+        <div class="graph-placeholder">
+            [ PITCH GRAPH VISUALIZER DISPLAY ]
+        </div>
+    </section>
+
+    <!-- Bottom Split Section -->
+    <section class="bottom-section">
+        <!-- LEFT FRAME -->
+        <div class="ui-frame left-frame">
+
+            <!-- Song Selection -->
+            <div class="selection-area">
+                <div class="list-headers">
+                    <div class="header-cell">Artists</div>
+                    <div class="header-cell">Songs</div>
+                </div>
+                <div class="list-content">
+                    <div class="column artist-col"></div>
+                    <div class="column song-col"></div>
+                </div>
+            </div>
+
+            <!-- Song Player -->
+            <div class="player-area">
+                <div class="progress-bar-container">
+                    <div class="progress-fill">
+                        <div class="progress-thumb"></div>
+                    </div>
+                </div>
+                <!-- Controls Grid -->
+                <div class="controls-row">
+                    <div class="track-info">
+                        <h4>--</h4>
+                        <span>--</span>
+                    </div>
+                    <div class="controls">
+                        <button class="play-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="volume-control">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        </svg>
+                        <div class="volume-bar">
+                            <div class="volume-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT FRAME -->
+        <div class="ui-frame right-frame">
+
+            <!-- Audio Frequency Visualizer (Flex: 1) -->
+            <div class="freq-visualizer-area">
+                <canvas id="pitchCanvas"></canvas>
+            </div>
+
+            <!-- Synced Lyrics Display (Flex: 1) -->
+            <div class="lyrics-area">
+                <div class="lyric-line"></div>
+                <div class="lyric-line active"></div>
+                <div class="lyric-line"></div>
+            </div>
+
+        </div>
+
+    </section>
+</main>
+<!-- At the end of body tag -->
+<script type="module" src="js/main.js"></script>
 
 </body>
 </html>

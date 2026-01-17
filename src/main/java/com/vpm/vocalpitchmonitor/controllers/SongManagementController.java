@@ -1,9 +1,6 @@
 package com.vpm.vocalpitchmonitor.controllers;
 
-import com.vpm.vocalpitchmonitor.DTOs.ArtistResponseDto;
-import com.vpm.vocalpitchmonitor.DTOs.LyricsResponseDto;
-import com.vpm.vocalpitchmonitor.DTOs.SongDto;
-import com.vpm.vocalpitchmonitor.DTOs.SongResponseDto;
+import com.vpm.vocalpitchmonitor.DTOs.*;
 import com.vpm.vocalpitchmonitor.services.SongManagementService;
 import com.vpm.vocalpitchmonitor.services.TrackService;
 import jakarta.validation.Valid;
@@ -117,5 +114,10 @@ public class SongManagementController {
     public List<SongResponseDto> findAllSongs(){
 
         return songManagementService.findAllSongs();
+    }
+
+    @GetMapping("/artist/all")
+    public ArtistListResponseDto findAllArtists() {
+        return songManagementService.findAllArtistNames();
     }
 }

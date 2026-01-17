@@ -1,5 +1,6 @@
 package com.vpm.vocalpitchmonitor.mappers;
 
+import com.vpm.vocalpitchmonitor.DTOs.ArtistListResponseDto;
 import com.vpm.vocalpitchmonitor.DTOs.AudiotrackResponseDto;
 import com.vpm.vocalpitchmonitor.DTOs.VocaltrackResponseDto;
 import com.vpm.vocalpitchmonitor.entities.Audiotrack;

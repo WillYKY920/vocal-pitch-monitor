@@ -38,19 +38,16 @@ public class Audiotrack {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
 
     public String getContentType() {return contentType;}
-
     public void setContentType(String contentType) {this.contentType = contentType;}
 
     public String getFileName() {
         return fileName;
     }
-
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
@@ -58,7 +55,6 @@ public class Audiotrack {
     public Long getByteSize() {
         return byteSize;
     }
-
     public void setByteSize(Long byteSize) {
         this.byteSize = byteSize;
     }
@@ -66,7 +62,6 @@ public class Audiotrack {
     public byte[] getAudioData() {
         return audioData;
     }
-
     public void setAudioData(byte[] audioData) {
         this.audioData = audioData;
     }
@@ -74,7 +69,6 @@ public class Audiotrack {
     public Song getSong() {
         return song;
     }
-
     public void setSong(Song song) {
         this.song = song;
     }

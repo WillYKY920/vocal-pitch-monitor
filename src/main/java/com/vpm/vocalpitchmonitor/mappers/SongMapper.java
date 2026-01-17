@@ -18,6 +18,7 @@ public class SongMapper {
     public SongResponseDto toSongResponseDto(Song song) {
 
         SongResponseDto response = new SongResponseDto(
+                song.getId(),
                 song.getTitle(),
                 song.getArtist().getArtistName(),
                 song.getDuration()
@@ -45,6 +46,10 @@ public class SongMapper {
             songResponseDtos.add(toSongResponseDto(song));
         }
         return new ArtistResponseDto(artist.getArtistName(), songResponseDtos);
+    }
+
+    public String artistToString(Artist artist){
+        return artist.getArtistName();
     }
 
 }

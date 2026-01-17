@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 
 public class LRCParser {
 
-    // This pattern matches [mm:ss.xx] where xx are centiseconds (1/100th of a second)
     private static final Pattern TIME_PATTERN = Pattern.compile("\\[(\\d{2}):(\\d{2})\\.(\\d{2})\\]");
 
     private static final Pattern METADATA_PATTERN = Pattern.compile("\\[([a-zA-Z]+):(.+?)\\]");

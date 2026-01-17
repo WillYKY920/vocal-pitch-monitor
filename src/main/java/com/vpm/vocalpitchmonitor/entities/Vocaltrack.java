@@ -38,14 +38,17 @@ public class Vocaltrack {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
 
-    public String getContentType() {return contentType;}
+    public String getContentType() {
+        return contentType;
+    }
 
-    public void setContentType(String contentType) {this.contentType = contentType;}
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
 
     public String getFileName() {
         return fileName;
