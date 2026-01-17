@@ -19,7 +19,7 @@ public class Audiotrack {
     @Column(name = "type") @JsonProperty("type")
     private String contentType;
 
-    @Column(name = "data", nullable = false, columnDefinition = "MEDIUMBLOB") //16MB
+    @Column(name = "data", nullable = false, columnDefinition = "bytea") //16MB
     @Lob
     private byte[] audioData;
 
