@@ -19,8 +19,7 @@ public class Audiotrack {
     @Column(name = "type") @JsonProperty("type")
     private String contentType;
 
-    @Column(name = "data", nullable = false, columnDefinition = "bytea") //16MB
-    @Lob
+    @Column(name = "data", nullable = false, columnDefinition = "bytea") @JsonProperty("data")
     private byte[] audioData;
 
     @OneToOne @JoinColumn(name = "song_id")
