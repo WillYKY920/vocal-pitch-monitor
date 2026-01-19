@@ -11,7 +11,7 @@ public class HomeController {
     */
     @GetMapping("/vpm")
     public String homePage() {
-        return "redirect:/home.html";
+        return "redirect:home-page/home.html";
     }
 
     /*
@@ -19,7 +19,7 @@ public class HomeController {
     */
     @GetMapping("/test")
     public String testPage() {
-        return "redirect:/test.html";
+        return "redirect:test-page/test.html";
     }
 
 }
