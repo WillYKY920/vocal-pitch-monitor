@@ -1,7 +1,7 @@
 // js/main.js
-import { LyricsManager } from './lyricsManager.js';
-import { AudioPlayer } from './audioPlayer.js';
-import { UIManager } from './uiManager.js';
+import { LyricsManager } from './classes/lyricsManager.js';
+import { AudioPlayer } from './classes/audioPlayer.js';
+import { UIManager } from './classes/uiManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize Lyrics Manager

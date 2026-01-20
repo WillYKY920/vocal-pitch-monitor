@@ -1,0 +1,72 @@
+:root {
+    --bg-dark: #121212;
+    --card-bg: #1E1E1E;
+    --card-header-bg: #2C2C2C;
+    --accent-purple: #7C4DFF;
+    --accent-purple-dim: #5e35b1;
+    --text-main: #FFFFFF;
+    --text-muted: #B0B0B0;
+    --border-radius: 12px;
+    --header-height: 60px;
+    --divider-color: #131313;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Header --- */
+header {
+    height: var(--header-height);
+    min-height: var(--header-height); /* Ensure minimum height */
+    max-height: var(--header-height); /* Ensure maximum height */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 50px;
+    border-bottom: 2px solid var(--accent-purple);
+    background-color: var(--bg-dark);
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.logo-icon {
+    width: 24px;
+    height: 24px;
+    background-color: var(--text-muted);
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>');
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>');
+    mask-repeat: no-repeat;
+    background-color: #fff;
+}
+
+nav a {
+    color: var(--text-main);
+    text-decoration: none;
+    margin-left: 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+nav a:hover {
+    opacity: 1;
+}

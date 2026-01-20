@@ -1,74 +1,4 @@
-:root {
-    --bg-dark: #121212;
-    --card-bg: #1E1E1E;
-    --card-header-bg: #2C2C2C;
-    --accent-purple: #7C4DFF;
-    --accent-purple-dim: #5e35b1;
-    --text-main: #FFFFFF;
-    --text-muted: #B0B0B0;
-    --border-radius: 12px;
-    --header-height: 60px;
-    --divider-color: #131313;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* --- Header --- */
-header {
-    height: var(--header-height);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 50px;
-    border-bottom: 2px solid var(--accent-purple);
-    background-color: var(--bg-dark);
-}
-
-.logo-area {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.logo-icon {
-    width: 24px;
-    height: 24px;
-    background-color: var(--text-muted);
-    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>');
-    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>');
-    mask-repeat: no-repeat;
-    background-color: #fff;
-}
-
-nav a {
-    color: var(--text-main);
-    text-decoration: none;
-    margin-left: 24px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-}
-
-nav a:hover {
-    opacity: 1;
-}
+@import url('../../global/header.css');
 
 /* --- Main Layout Grid --- */
 main {
@@ -88,9 +18,12 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-left: 5px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    position: relative; /* Context for absolute children */
 }
-
 .graph-placeholder {
     color: var(--text-muted);
     font-size: 0.9rem;
@@ -390,4 +323,38 @@ main {
 
 .lyric-line.empty {
     height: 1.2rem;
+}
+/* --- Vocal Pitch Monitor Styles --- */
+
+#monitor-container {
+    position: relative;
+    width: 100%;       /* Adapted to fit your container */
+    height: 100%;      /* Adapted to fit your container */
+    background: var(--bg-dark);
+    border: 8px solid var(--card-bg);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+    border-radius: 12px; /* Matches your variable --border-radius */
+}
+
+/* Canvas for the scrolling graph */
+#monitor-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;  /* or 12px */
+}
+
+/* The big note display */
+#note-display {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 48px;
+    font-weight: bold;
+    color: #ddd;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    pointer-events: none;
+    z-index: 5;
 }

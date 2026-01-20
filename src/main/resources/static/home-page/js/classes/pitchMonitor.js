@@ -7,84 +7,79 @@ export class PitchMonitor {
         this.noteDisplay = document.getElementById('note-display');
 
         // Configuration
-        this.MIN_FREQ = 65;   // C2
-        this.MAX_FREQ = 1050; // C6
+        this.MIN_FREQ = 65;   // C2 (Lower bound for detection only)
+        this.MAX_FREQ = 1050; // C6 (Upper bound for detection only)
         this.BUFFER_SIZE = 2048;
-        this.GRAPH_SPEED = 2;
+        this.GRAPH_SPEED = 4; // Increased speed for better flow
+        this.VISIBLE_RANGE_SEMITONES = 18; // View height (1.5 octaves) - Makes rows taller
+
         this.noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
         // State
         this.audioContext = null;
         this.analyser = null;
-        this.mediaStreamSource = null;
         this.isRunning = false;
+
         this.historyData = [];
         this.maxHistoryLen = 0;
-        this.microphoneGranted = false;
+
+        // Camera State for scrolling
+        this.currentCenterPitch = 60; // Start at Middle C (C4)
+        this.targetCenterPitch = 60;
+
+        this.updatePitch = this.updatePitch.bind(this);
+        this.resizeCanvas = this.resizeCanvas.bind(this);
 
         this.init();
     }
 
     init() {
-        if (!this.canvas) {
-            console.warn("PitchMonitor: Canvas not found.");
-            return;
-        }
-
-        // Handle window resizing
+        if (!this.canvas) return;
+        window.addEventListener('resize', this.resizeCanvas);
         this.resizeCanvas();
-        window.addEventListener('resize', () => this.resizeCanvas());
     }
 
     resizeCanvas() {
+        if (!this.canvas) return;
         const parent = this.canvas.parentElement;
         if (parent) {
             this.canvas.width = parent.clientWidth;
             this.canvas.height = parent.clientHeight;
-            this.maxHistoryLen = Math.ceil(this.canvas.width / this.GRAPH_SPEED) + 1;
         }
+        this.maxHistoryLen = Math.ceil(this.canvas.width / this.GRAPH_SPEED) + 1;
+        if (!this.isRunning) this.draw();
     }
 
-    // Public method to start monitoring
-    async start() {
-        if (this.isRunning) return; // Already running
+    start(audioContext, sourceNode) {
+        if (this.isRunning) return;
+        if (!audioContext || !sourceNode) return;
 
-        try {
-            // Request microphone permission only once
-            if (!this.microphoneGranted) {
-                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        this.audioContext = audioContext;
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = this.BUFFER_SIZE;
 
-                this.mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
-                this.analyser = this.audioContext.createAnalyser();
-                this.analyser.fftSize = this.BUFFER_SIZE;
-                this.mediaStreamSource.connect(this.analyser);
+        sourceNode.connect(this.analyser);
 
-                this.microphoneGranted = true;
-            }
-
-            this.isRunning = true;
-            this.updatePitch(); // Start the loop
-        } catch (err) {
-            console.error("PitchMonitor Error:", err);
-            alert("Could not access microphone. Please grant permission.");
-        }
+        this.isRunning = true;
+        this.updatePitch();
     }
 
-    // Public method to stop monitoring
     stop() {
         this.isRunning = false;
+        if (this.analyser) {
+            this.analyser.disconnect();
+            this.analyser = null;
+        }
     }
 
     autoCorrelate(buffer, sampleRate) {
         let SIZE = buffer.length;
         let sumOfSquares = 0;
         for (let i = 0; i < SIZE; i++) {
-            let val = buffer[i];
-            sumOfSquares += val * val;
+            sumOfSquares += buffer[i] * buffer[i];
         }
-        let rootMeanSquare = Math.sqrt(sumOfSquares / SIZE);
-        if (rootMeanSquare < 0.01) return -1;
+        let rms = Math.sqrt(sumOfSquares / SIZE);
+        if (rms < 0.01) return -1;
 
         let r1 = 0, r2 = SIZE - 1, thres = 0.2;
         for (let i = 0; i < SIZE / 2; i++) {
@@ -93,7 +88,6 @@ export class PitchMonitor {
         for (let i = 1; i < SIZE / 2; i++) {
             if (Math.abs(buffer[SIZE - i]) < thres) { r2 = SIZE - i; break; }
         }
-
         buffer = buffer.slice(r1, r2);
         SIZE = buffer.length;
 
@@ -103,19 +97,16 @@ export class PitchMonitor {
                 c[i] = c[i] + buffer[j] * buffer[j + i];
             }
         }
-
         let d = 0; while (c[d] > c[d + 1]) d++;
         let maxval = -1, maxpos = -1;
         for (let i = d; i < SIZE; i++) {
             if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
         }
-
         let T0 = maxpos;
         let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
         let a = (x1 + x3 - 2 * x2) / 2;
         let b = (x3 - x1) / 2;
         if (a) T0 = T0 - b / (2 * a);
-
         return sampleRate / T0;
     }
 
@@ -139,70 +130,108 @@ export class PitchMonitor {
 
         if (frequency !== -1 && frequency > this.MIN_FREQ && frequency < this.MAX_FREQ) {
             const midiFloat = this.frequencyToMidi(frequency);
-            if(this.noteDisplay) this.noteDisplay.innerText = this.midiToNoteName(midiFloat);
+            if (this.noteDisplay) this.noteDisplay.innerText = this.midiToNoteName(midiFloat);
+
+            // Update target to center this note
+            this.targetCenterPitch = midiFloat;
+
             this.historyData.push({ val: midiFloat, active: true });
         } else {
             this.historyData.push({ val: null, active: false });
         }
 
         if (this.historyData.length > this.maxHistoryLen) this.historyData.shift();
-
         this.draw();
-        requestAnimationFrame(() => this.updatePitch());
+        requestAnimationFrame(this.updatePitch);
     }
 
     draw() {
+        if (!this.ctx) return;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        const minMidi = this.frequencyToMidi(this.MIN_FREQ);
-        const maxMidi = this.frequencyToMidi(this.MAX_FREQ);
+        // --- Smooth Camera Movement ---
+        // Lerp current center towards target (0.05 is the smoothing factor)
+        // If no note is detected, we stay at the last known pitch
+        this.currentCenterPitch += (this.targetCenterPitch - this.currentCenterPitch) * 0.05;
+
+        // Calculate visible bounds based on dynamic center
+        const halfRange = this.VISIBLE_RANGE_SEMITONES / 2;
+        const minMidi = this.currentCenterPitch - halfRange;
+        const maxMidi = this.currentCenterPitch + halfRange;
         const range = maxMidi - minMidi;
 
+        // Function to map MIDI value to Y position
         const getY = (midiVal) => {
             return this.canvas.height - ((midiVal - minMidi) / range) * this.canvas.height;
-        }
+        };
 
-        // Draw Grid
-        this.ctx.font = "11px sans-serif";
+        // --- Draw Grid ---
+        this.ctx.font = "14px sans-serif";
         this.ctx.textAlign = "left";
+        this.ctx.textBaseline = "middle";
 
-        for (let m = Math.ceil(minMidi); m <= maxMidi; m++) {
+        // We extend the loop slightly beyond view to ensure lines entering/leaving don't pop
+        const startGrid = Math.floor(minMidi);
+        const endGrid = Math.ceil(maxMidi);
+
+        for (let m = startGrid; m <= endGrid; m++) {
             const name = this.midiToNoteName(m);
-            const isC = name.startsWith("C ");
+            const isC = name.startsWith("C "); // C notes
+            const isSharp = name.includes("#");
             const y = getY(m);
 
-            if (!name.includes("#")) {
-                this.ctx.strokeStyle = isC ? "#444" : "#2a2a2a";
+            // Don't draw sharps as lines to keep it clean, only naturals
+            if (!isSharp) {
                 this.ctx.beginPath();
                 this.ctx.moveTo(0, y);
                 this.ctx.lineTo(this.canvas.width, y);
+
+                // Style
+                if (isC) {
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeStyle = "#666"; // Brighter for C
+                } else {
+                    this.ctx.lineWidth = 1;
+                    this.ctx.strokeStyle = "#333"; // Dim for others
+                }
                 this.ctx.stroke();
 
-                if (isC) {
-                    this.ctx.fillStyle = "#666";
-                    this.ctx.fillText(name, 5, y - 2);
-                }
+                // Labels
+                this.ctx.fillStyle = isC ? "#DDD" : "#777";
+                this.ctx.fillText(name, 10, y);
             }
         }
 
-        // Draw Trace
+        // --- Draw Trace ---
         if (this.historyData.length > 1) {
             this.ctx.beginPath();
-            this.ctx.lineWidth = 3;
-            this.ctx.strokeStyle = "#7C4DFF";
+            this.ctx.lineWidth = 4;
+            this.ctx.strokeStyle = "#FFFF00"; // Yellow
             this.ctx.lineCap = "round";
             this.ctx.lineJoin = "round";
-            this.ctx.shadowBlur = 8;
-            this.ctx.shadowColor = "#7C4DFF";
+            // Glow effect
+            this.ctx.shadowBlur = 10;
+            this.ctx.shadowColor = "#FFFF00";
 
             let started = false;
+
             for (let i = 0; i < this.historyData.length; i++) {
+                // historyData is old -> new. Loop backwards to draw right -> left
                 const point = this.historyData[this.historyData.length - 1 - i];
                 const x = this.canvas.width - (i * this.GRAPH_SPEED);
-                if (x < -10) break;
+
+                if (x < -10) break; // Off screen
 
                 if (point.active) {
                     const y = getY(point.val);
+
+                    // Don't draw if point is way off screen (optimization)
+                    // but allow some buffer so lines don't clip abruptly
+                    if (y < -50 || y > this.canvas.height + 50) {
+                        if (started) started = false; // Break line if we go way off
+                        continue;
+                    }
+
                     if (!started) {
                         this.ctx.moveTo(x, y);
                         started = true;
@@ -214,10 +243,24 @@ export class PitchMonitor {
                             this.ctx.moveTo(x, y);
                         }
                     }
+                } else {
+                    started = false; // Break line on silence
                 }
             }
             this.ctx.stroke();
+
+            // Reset shadow
             this.ctx.shadowBlur = 0;
+
+            // Draw "Current Note" indicator line in the center
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+            this.ctx.lineWidth = 1;
+            this.ctx.setLineDash([5, 5]);
+            this.ctx.moveTo(0, this.canvas.height / 2);
+            this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
+            this.ctx.stroke();
+            this.ctx.setLineDash([]);
         }
     }
 }

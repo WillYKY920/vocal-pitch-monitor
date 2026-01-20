@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pitch Detection Monitor</title>
 
-    <link rel="icon" type="image/png" href="styles/favicon.png" />
+    <link rel="icon" type="image/png" href="../global/favicon.png" />
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
@@ -17,10 +17,10 @@
         <span>Pitch Detection Monitor</span>
     </div>
     <nav>
-        <a href="#">HOME</a>
-        <a href="../test.html">TEST</a>
-        <a href="#">HELP</a>
-        <a href="#">ABOUT US</a>
+        <a href="/home-page/home.html">HOME</a>
+        <a href="/test-page/test.html">TEST</a>
+        <a href="/help-page/help.html">HELP</a>
+        <a href="/aboutus-page/aboutus.html">ABOUT US</a>
     </nav>
 </header>
 
@@ -28,8 +28,9 @@
 <main>
     <!-- Top: Pitch Graph -->
     <section class="pitch-graph-container">
-        <div class="graph-placeholder">
-            [ PITCH GRAPH VISUALIZER DISPLAY ]
+        <div id="monitor-container">
+            <div id="note-display"></div>
+            <canvas id="pitchCanvas"></canvas>
         </div>
     </section>
 
@@ -88,7 +89,7 @@
 
             <!-- Audio Frequency Visualizer (Flex: 1) -->
             <div class="freq-visualizer-area">
-                <canvas id="pitchCanvas"></canvas>
+                <canvas id="waveformCanvas"></canvas>
             </div>
 
             <!-- Synced Lyrics Display (Flex: 1) -->

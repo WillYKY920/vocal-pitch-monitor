@@ -1,5 +1,5 @@
 // js/uiManager.js
-import { API } from './api.js';
+import { API } from '../api.js';
 import { formatTime } from './utils.js';
 
 export class UIManager {
