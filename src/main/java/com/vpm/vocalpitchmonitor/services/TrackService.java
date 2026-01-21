@@ -8,6 +8,7 @@ import com.vpm.vocalpitchmonitor.entities.Song;
 import com.vpm.vocalpitchmonitor.entities.Vocaltrack;
 import com.vpm.vocalpitchmonitor.mappers.FileMapper;
 import com.vpm.vocalpitchmonitor.repositories.AudiotrackRepository;
+import com.vpm.vocalpitchmonitor.repositories.SongRepository;
 import com.vpm.vocalpitchmonitor.repositories.VocaltrackRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
@@ -21,6 +22,7 @@ import java.io.IOException;
 @Service
 public class TrackService {
 
+    private final SongRepository songRepository;
     private FileMapper mapper;
 
     private VocaltrackRepository vocaltrackRepository;
@@ -28,10 +30,11 @@ public class TrackService {
     private AudiotrackRepository audiotrackRepository;
 
     @Autowired
-    public TrackService(FileMapper mapper, VocaltrackRepository vocaltrackRepository, AudiotrackRepository audiotrackRepository) {
+    public TrackService(FileMapper mapper, VocaltrackRepository vocaltrackRepository, AudiotrackRepository audiotrackRepository, SongRepository songRepository) {
         this.mapper = mapper;
         this.vocaltrackRepository = vocaltrackRepository;
         this.audiotrackRepository = audiotrackRepository;
+        this.songRepository = songRepository;
     }
 
     public void saveVocaltrack(MultipartFile vocalTrackFile, int songId) throws IOException {
@@ -50,4 +53,5 @@ public class TrackService {
                 .map(mapper::toAudiotrackResponseDto)
                 .orElseThrow(()-> new EntityNotFoundException("Song not found with id: " + id));
     }
+
 }

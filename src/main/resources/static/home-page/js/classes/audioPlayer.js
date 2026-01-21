@@ -74,6 +74,29 @@ export class AudioPlayer {
         if(this.playBtn) {
             this.playBtn.addEventListener('click', () => this.togglePlay());
         }
+
+        document.addEventListener('keydown', (e) => {
+            // Prevent triggering if user is typing in an input field
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            switch(e.code) {
+                case 'Space':
+                    e.preventDefault(); // Prevents page scrolling when pressing space
+                    this.togglePlay();
+                    break;
+                case 'ArrowLeft':
+                    // Rewind 5s, ensuring we don't go below 0
+                    this.audio.currentTime = Math.max(0, this.audio.currentTime - 5);
+                    break;
+                case 'ArrowRight':
+                    // Forward 5s, ensuring we don't exceed duration
+                    if (isFinite(this.audio.duration)) {
+                        this.audio.currentTime = Math.min(this.audio.duration, this.audio.currentTime + 5);
+                    }
+                    break;
+            }
+        });
+
         this.audio.addEventListener('timeupdate', () => this.handleTimeUpdate());
         this.audio.addEventListener('loadedmetadata', () => {
             if (isFinite(this.audio.duration)) {

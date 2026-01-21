@@ -9,6 +9,7 @@ public record SongResponseDto(
         String artist,
 
         int duration
-){
+)
+{
 
 }

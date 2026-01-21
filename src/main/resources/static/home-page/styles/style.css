@@ -23,6 +23,7 @@ main {
     min-height: 0;
     overflow: hidden;
     position: relative; /* Context for absolute children */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 .graph-placeholder {
     color: var(--text-muted);
@@ -50,6 +51,7 @@ main {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
 /* --- LEFT FRAME: Selection & Player --- */

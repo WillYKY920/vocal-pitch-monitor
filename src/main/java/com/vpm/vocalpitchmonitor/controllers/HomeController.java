@@ -14,12 +14,6 @@ public class HomeController {
         return "redirect:home-page/home.html";
     }
 
-    /*
-    http://localhost:8080/test
-    */
-    @GetMapping("/test")
-    public String testPage() {
-        return "redirect:test-page/test.html";
-    }
+
 
 }

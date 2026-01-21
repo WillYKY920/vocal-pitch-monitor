@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pitch Detection Monitor</title>
 
-    <link rel="icon" type="image/png" href="../global/favicon.png" />
-    <link rel="stylesheet" href="./styles/style.css">
+    <link rel="icon" type="image/png" href="/global/favicon.png" />
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
 
 <header>
     <div class="logo-area">
@@ -23,168 +22,94 @@
     </nav>
 </header>
 
-<div class="container">
-    <h1>Song Management - Vocal Pitch Monitor</h1>
-    <h2>This page is used for purpose of testing and debugging.</h2>
-    <h3>page details is in src/main/resources/static/home.html</h3>
+<body>
 
-    <!-- Section 1: Search Song by ID -->
-    <div class="section">
-        <h2>1. Search Song by ID</h2>
-        <div class="endpoint-info">
-            <strong>Endpoint:</strong> GET /song/{songId}<br>
-            <strong>Example:</strong> http://localhost:8080/song/1
+<!-- Left Panel: Controls -->
+<div class="control-panel">
+
+    <!-- Artist Section -->
+    <div class="card">
+        <h3>Artist Management</h3>
+        <div class="form-group">
+            <label>Artist Name</label>
+            <input type="text" id="artistNameInput" placeholder="Enter artist name">
+        </div>
+        <div class="btn-group">
+            <button class="btn-get" onclick="getArtistByName()">GET</button>
+            <button class="btn-action" onclick="saveArtist()">SAVE (POST)</button>
+        </div>
+    </div>
+
+    <!-- Song Section -->
+    <div class="card">
+        <h3>Song Management</h3>
+        <div class="form-group">
+            <label>Song ID</label>
+            <input type="number" id="songIdInput" placeholder="Enter Song ID">
+        </div>
+        <div class="btn-group">
+            <button class="btn-get" onclick="getSongById()">GET Song</button>
+            <button class="btn-get" onclick="getLyricsById()">GET Lyrics</button>
+            <button class="btn-delete" onclick="deleteSongById()">DELETE</button>
+        </div>
+    </div>
+
+    <!-- Lists Section -->
+    <div class="card">
+        <h3>List of Songs/Artists</h3>
+        <div class="btn-group">
+            <button class="btn-get" onclick="getAllSongs()">List All Songs</button>
+            <button class="btn-get" onclick="getAllArtists()">List All Artists</button>
+        </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="card">
+        <h3>Uploads</h3>
+
+        <!-- Upload LRC -->
+        <div class="form-group">
+            <label>Upload Song (lrc file)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="file" id="lrcFile" accept=".lrc">
+                <button class="btn-post" style="width: 80px;" onclick="uploadLrc()">UPLOAD</button>
+            </div>
+        </div>
+
+        <hr style="border-color: #333">
+
+        <!-- Upload Tracks -->
+        <div class="form-group">
+            <label>Target Song ID for Audio/Vocal</label>
+            <input type="number" id="uploadSongId" placeholder="ID">
         </div>
 
         <div class="form-group">
-            <label for="songId">Song ID:</label>
-            <input type="number" id="songId" placeholder="Enter song ID (e.g., 1)" min="1">
-        </div>
-
-        <button onclick="searchSong()">Search Song</button>
-        <div id="songResult" class="result" style="display: none;"></div>
-    </div>
-
-    <!-- Section 2: File Uploads -->
-    <div class="section">
-        <h2>2. Upload Files</h2>
-        <div class="endpoint-info">
-            <strong>Vocal Track Endpoint:</strong> POST /vocal/{songId}<br>
-            <strong>Audio Track Endpoint:</strong> POST /audio/{songId}<br>
-            <strong>Note:</strong> Song must exist before uploading files
+            <label>Upload Vocal Track (wav/flac)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="file" id="vocalFile" accept=".wav,.flac,.mp3">
+                <button class="btn-post" style="width: 80px;" onclick="uploadVocal()">UPLOAD</button>
+            </div>
         </div>
 
         <div class="form-group">
-            <label for="uploadSongId">Song ID for Upload:</label>
-            <input type="number" id="uploadSongId" placeholder="Enter song ID" min="1">
-        </div>
-
-        <div class="form-group">
-            <label for="vocalFile">Vocal Track File:</label>
-            <input type="file" id="vocalFile" accept="audio/*">
-            <div class="file-info">Upload vocal track file (MP3, WAV, etc.)</div>
-        </div>
-
-        <button onclick="uploadVocalTrack()">Upload Vocal Track</button>
-
-        <div class="form-group" style="margin-top: 20px;">
-            <label for="audioFile">Audio Track File:</label>
-            <input type="file" id="audioFile" accept="audio/*">
-            <div class="file-info">Upload audio track file (MP3, WAV, etc.)</div>
-        </div>
-
-        <button onclick="uploadAudioTrack()">Upload Audio Track</button>
-        <div id="uploadStatus" class="status-message" style="display: none;"></div>
-    </div>
-
-    <!-- Section 3: Search Artist by Name -->
-    <div class="section">
-        <h2>3. Search /Save Artist by Name</h2>
-        <div class="endpoint-info">
-            <strong>Search Artist Endpoint:</strong> GET /artist/{artist_name}<br>
-            <strong>Save Artist Endpoint:</strong> POST /artist/save<br>
-        </div>
-
-        <div class="form-group">
-            <label for="artistName">Artist Name:</label>
-            <input type="text" id="artistName" placeholder="Enter artist name">
-        </div>
-
-        <button onclick="searchArtist()">Search Artist</button>
-        <button onclick="saveArtist()">Save New Artist</button>
-        <div id="artistResult" class="result" style="display: none;"></div>
-    </div>
-
-    <!-- Section 4: Get All Songs -->
-    <div class="section">
-        <h2>4. Get All Songs</h2>
-        <div class="endpoint-info">
-            <strong>Endpoint:</strong> GET /song/all<br>
-            <strong>Example:</strong> http://localhost:8080/song/all
-        </div>
-
-        <button onclick="getAllSongs()">Get All Songs</button>
-        <div id="allSongsResult" class="result" style="display: none;"></div>
-    </div>
-
-    <!-- Section 5: Save LRC File -->
-    <div class="section">
-        <h2>5. Upload Song</h2>
-        <div class="endpoint-info">
-            <strong>Endpoint:</strong> POST /lrc/save<br>
-            <strong>Note:</strong> Upload LRC lyrics file for a song
-        </div>
-
-        <div class="form-group">
-            <label for="lrcFile">LRC File:</label>
-            <input type="file" id="lrcFile" accept=".lrc">
-            <div class="file-info">Upload LRC lyrics file (.lrc format)</div>
-        </div>
-
-        <button onclick="saveLrcFile()">Upload Song</button>
-        <div id="lrcStatus" class="status-message" style="display: none;"></div>
-    </div>
-
-    <!-- Section 6: Audio Streaming Player -->
-    <div class="section">
-        <h2>6. Audio Streaming Player</h2>
-        <div class="endpoint-info">
-            <strong>Play Endpoint:</strong> GET /play/{song_id}<br>
-            <strong>Info Endpoint:</strong> GET /play/info<br>
-        </div>
-
-        <div style="margin: 20px 0;">
-            <audio id="audioPlayer" controls style="width: 100%;">
-                Your browser does not support the audio element.
-            </audio>
-        </div>
-
-        <div class="form-group">
-            <label for="trackId">Song ID:</label>
-            <input type="number" id="trackId" placeholder="Enter track ID to play" min="1">
-        </div>
-
-        <button onclick="playTrack()">Play Track</button>
-        <button onclick="getNowPlayingInfo()">Get Now Playing Info</button>
-        <div id="playerStatus" class="result" style="display: none; margin-top: 15px;"></div>
-        <div id="nowPlayingInfo" class="result" style="display: none; margin-top: 15px;"></div>
-    </div>
-
-    <!-- Section 7: Synced Lyrics Display -->
-    <div class="section">
-        <h2>7. Synchronized Lyrics</h2>
-        <div id="lyricsContainer" style="
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #f9f9f9;
-            min-height: 100px;
-            margin-top: 10px;
-            text-align: center;
-        ">
-            <div id="currentLyric" style="
-                font-size: 20px;
-                font-weight: bold;
-                color: #2c3e50;
-                margin-bottom: 10px;
-                min-height: 30px;
-                line-height: 1.4;
-            ">--</div>
-            <div id="nextLyric" style="
-                font-size: 16px;
-                color: #666;
-                min-height: 24px;
-                line-height: 1.4;
-            "></div>
+            <label>Upload Audio Track (wav/flac)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="file" id="audioFile" accept=".wav,.flac,.mp3">
+                <button class="btn-post" style="width: 80px;" onclick="uploadAudio()">UPLOAD</button>
+            </div>
         </div>
     </div>
+
 </div>
 
-<!-- Import JavaScript files -->
-<script src="js/main.js"></script>
-<script src="js/song.js"></script>
-<script src="js/upload.js"></script>
-<script src="js/player.js"></script>
+<!-- Right Panel: Output -->
+<div class="response-panel">
+    <h3 style="margin-top:20px;margin-left:25px; color:#e1e1e1;">Response Output (JSON)</h3>
+    <div id="responseOutput"></div>
+</div>
+
+<script src="main.js"></script>
 
 </body>
 </html>

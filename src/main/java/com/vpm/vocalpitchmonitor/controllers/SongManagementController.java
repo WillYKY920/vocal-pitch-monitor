@@ -89,7 +89,7 @@ public class SongManagementController {
     }
 
     /*
-    http://localhost:8080/artist/{artist-name}
+    http://localhost:8080/artist/${artist-name}
     */
     @GetMapping("/artist/{artist_name}")
     public ArtistResponseDto findArtistByName(@PathVariable("artist_name") @Valid String name){
@@ -98,7 +98,7 @@ public class SongManagementController {
     }
 
     /*
-    http://localhost:8080/lyrics/{song_id}
+    http://localhost:8080/lyrics/${song_id}
     */
     @GetMapping("/lyrics/{song_id}")
     public LyricsResponseDto findLyricsBySongId(@PathVariable("song_id") @Valid int id) {
@@ -116,8 +116,21 @@ public class SongManagementController {
         return songManagementService.findAllSongs();
     }
 
+    /*
+    http://localhost:8080/artist/all
+    */
     @GetMapping("/artist/all")
     public ArtistListResponseDto findAllArtists() {
+
         return songManagementService.findAllArtistNames();
+    }
+
+    /*
+    http://localhost:8080/song/delete/${song-id}
+    */
+    @GetMapping("/song/delete/{song-id}")
+    public void deleteSongBySongId(@PathVariable("song-id") int songId) {
+
+        songManagementService.deleteSongBySongId(songId);
     }
 }

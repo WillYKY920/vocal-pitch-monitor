@@ -10,6 +10,7 @@ import com.vpm.vocalpitchmonitor.utils.LRCParser;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -138,4 +139,14 @@ public class SongManagementService {
                 .map(mapper::toSongResponseDto)
                 .collect(Collectors.toList());
     }
+
+    // cascaded deletion
+    public void deleteSongBySongId(int id) {
+        if (!songRepository.existsById(id)) {
+            throw new EntityNotFoundException("Song not found with id: " + id);
+        }
+        songRepository.deleteById(id);
+    }
+
+
 }
