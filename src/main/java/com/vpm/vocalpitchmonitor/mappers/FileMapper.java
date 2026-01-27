@@ -1,8 +1,7 @@
 package com.vpm.vocalpitchmonitor.mappers;
 
-import com.vpm.vocalpitchmonitor.DTOs.ArtistListResponseDto;
 import com.vpm.vocalpitchmonitor.DTOs.AudiotrackResponseDto;
-import com.vpm.vocalpitchmonitor.DTOs.VocaltrackResponseDto;
+import com.vpm.vocalpitchmonitor.DTOs.VocalTrackDto;
 import com.vpm.vocalpitchmonitor.entities.Audiotrack;
 import com.vpm.vocalpitchmonitor.entities.Song;
 import com.vpm.vocalpitchmonitor.entities.Vocaltrack;
@@ -25,27 +24,25 @@ public class FileMapper {
         this.audiotrackRepository = audiotrackRepository;
     }
 
-    public Vocaltrack toVocaltrack(MultipartFile vocalTrackFile, int songId) throws IOException, EntityNotFoundException {
+    public Vocaltrack toVocalTrack(VocalTrackDto vocalTrackDto, int songId) throws EntityNotFoundException {
 
         Song song = songRepository.findById(songId)
                 .orElseThrow(() -> new EntityNotFoundException("Song not found with id: " + songId));
 
         Vocaltrack entity = new Vocaltrack();
 
-        entity.setFileName(vocalTrackFile.getOriginalFilename());
-        entity.setByteSize(vocalTrackFile.getSize());
-        entity.setVocalData(vocalTrackFile.getBytes());
-        entity.setContentType(vocalTrackFile.getContentType());
+        entity.setFileName(vocalTrackDto.fileName());
+        entity.setSamples(vocalTrackDto.samples());
+        entity.setVocalData(vocalTrackDto.pitchData());
         entity.setSong(song);
 
         return entity;
     }
 
-    public VocaltrackResponseDto toVocaltrackResponseDto(Vocaltrack vocaltrack){
-
-        return new VocaltrackResponseDto(
+    public VocalTrackDto toVocalTrackDto(Vocaltrack vocaltrack) {
+        return new VocalTrackDto(
                 vocaltrack.getFileName(),
-                vocaltrack.getByteSize(),
+                vocaltrack.getSamples(),
                 vocaltrack.getVocalData()
         );
     }

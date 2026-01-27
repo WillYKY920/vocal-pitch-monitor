@@ -1,6 +1,7 @@
 package com.vpm.vocalpitchmonitor.controllers;
 
 import com.vpm.vocalpitchmonitor.DTOs.*;
+import com.vpm.vocalpitchmonitor.entities.Vocaltrack;
 import com.vpm.vocalpitchmonitor.services.SongManagementService;
 import com.vpm.vocalpitchmonitor.services.TrackService;
 import jakarta.validation.Valid;
@@ -31,26 +32,35 @@ public class SongManagementController {
     /*
     http://localhost:8080/vocal/{songId}
     */
-    @PostMapping("/vocal/{song_id}")
-    public ResponseEntity<?> saveVocaltrack(
-            @RequestParam("file") @NotNull(message = "File is empty") MultipartFile vocalTrackFile,
-            @PathVariable("song_id") int id
+    @PostMapping("/vocal/{song-id}")
+    public VocalTrackDto saveVocalTrack(
+            @RequestBody VocalTrackDto vocalTrackDto,
+            @PathVariable("song-id") int id
     ) throws IOException {
+        trackService.saveVocalTrack(vocalTrackDto, id);
+        return vocalTrackDto;
+    }
 
-        trackService.saveVocaltrack(vocalTrackFile, id);
+    /*
+    http://localhost:8080/audio/{song-id}
+     */
+    @PostMapping("/audio/{song-id}")
+    public ResponseEntity<?> saveAudiotrack(
+            @RequestParam("file") @NotNull(message = "File is empty") MultipartFile audioTrackFile,
+            @PathVariable("song-id") int id
+    ) throws IOException {
+        trackService.saveAudiotrack(audioTrackFile, id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /*
-    http://localhost:8080/audio/{songId}
-     */
-    @PostMapping("/audio/{song_id}")
-    public ResponseEntity<?> saveAudiotrack(
-            @RequestParam("file") @NotNull(message = "File is empty") MultipartFile audioTrackFile,
-            @PathVariable("song_id") int id
-    ) throws IOException {
-        trackService.saveAudiotrack(audioTrackFile, id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    http://localhost:8080/vocal/{song-id}
+    */
+    @GetMapping("/vocal/{song-id}")
+    public VocalTrackDto findVocalTrackBySongId(
+            @PathVariable("song-id") int id
+    ){
+        return trackService.getVocalTrackDtoBySongId(id);
     }
 
     /*

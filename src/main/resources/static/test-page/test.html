@@ -1,51 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pitch Detection Monitor</title>
-
-    <link rel="icon" type="image/png" href="/global/favicon.png" />
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css" />
 </head>
 
+<body>
 <header>
     <div class="logo-area">
         <div class="logo-icon"></div>
         <span>Pitch Detection Monitor</span>
     </div>
     <nav>
-        <a href="/home-page/home.html">HOME</a>
-        <a href="/test-page/test.html">TEST</a>
-        <a href="/help-page/help.html">HELP</a>
-        <a href="/aboutus-page/aboutus.html">ABOUT US</a>
+    <a href="/home-page/home.html">HOME</a>
+    <a href="/test-page/test.html">TEST</a>
+    <a href="/help-page/help.html">HELP</a>
+    <a href="/aboutus-page/aboutus.html">ABOUT US</a>
     </nav>
 </header>
 
-<body>
-
-<!-- Left Panel: Controls -->
 <div class="control-panel">
-
-    <!-- Artist Section -->
     <div class="card">
         <h3>Artist Management</h3>
         <div class="form-group">
             <label>Artist Name</label>
-            <input type="text" id="artistNameInput" placeholder="Enter artist name">
+            <input type="text" id="artistNameInput" placeholder="Enter artist name" />
         </div>
         <div class="btn-group">
             <button class="btn-get" onclick="getArtistByName()">GET</button>
-            <button class="btn-action" onclick="saveArtist()">SAVE (POST)</button>
+            <button class="btn-action" onclick="saveArtist()">SAVE POST</button>
         </div>
     </div>
 
-    <!-- Song Section -->
     <div class="card">
         <h3>Song Management</h3>
         <div class="form-group">
             <label>Song ID</label>
-            <input type="number" id="songIdInput" placeholder="Enter Song ID">
+            <input type="number" id="songIdInput" placeholder="Enter Song ID" />
         </div>
         <div class="btn-group">
             <button class="btn-get" onclick="getSongById()">GET Song</button>
@@ -54,7 +47,6 @@
         </div>
     </div>
 
-    <!-- Lists Section -->
     <div class="card">
         <h3>List of Songs/Artists</h3>
         <div class="btn-group">
@@ -63,53 +55,60 @@
         </div>
     </div>
 
-    <!-- Upload Section -->
     <div class="card">
         <h3>Uploads</h3>
 
-        <!-- Upload LRC -->
         <div class="form-group">
-            <label>Upload Song (lrc file)</label>
+            <label>Upload Song lrc file</label>
             <div style="display:flex; gap:10px;">
-                <input type="file" id="lrcFile" accept=".lrc">
+                <input type="file" id="lrcFile" accept=".lrc" />
                 <button class="btn-post" style="width: 80px;" onclick="uploadLrc()">UPLOAD</button>
             </div>
         </div>
 
-        <hr style="border-color: #333">
+        <hr style="border-color: #333;" />
 
-        <!-- Upload Tracks -->
         <div class="form-group">
             <label>Target Song ID for Audio/Vocal</label>
-            <input type="number" id="uploadSongId" placeholder="ID">
+            <input type="number" id="uploadSongId" placeholder="ID" />
         </div>
 
         <div class="form-group">
-            <label>Upload Vocal Track (wav/flac)</label>
+            <label>Upload Vocal Track (.wav/.flac)</label>
             <div style="display:flex; gap:10px;">
-                <input type="file" id="vocalFile" accept=".wav,.flac,.mp3">
+                <input type="file" id="vocalFile" accept=".wav,.flac,.mp3" />
                 <button class="btn-post" style="width: 80px;" onclick="uploadVocal()">UPLOAD</button>
             </div>
         </div>
 
         <div class="form-group">
-            <label>Upload Audio Track (wav/flac)</label>
+            <label>Upload Audio Track (.wav/.flac)</label>
             <div style="display:flex; gap:10px;">
-                <input type="file" id="audioFile" accept=".wav,.flac,.mp3">
+                <input type="file" id="audioFile" accept=".wav,.flac,.mp3" />
                 <button class="btn-post" style="width: 80px;" onclick="uploadAudio()">UPLOAD</button>
             </div>
         </div>
     </div>
 
+    <div class="card">
+        <h3>YIN Visualization</h3>
+        <div class="form-group">
+            <label>Target Song ID for Vocal Track</label>
+            <input type="number" id="songIdInput2" placeholder="Enter Song ID" />
+        </div>
+        <div class="btn-group">
+            <button class="btn-get" onclick="getVocalPitchesBySongId()">Get Vocal Pitches (Hz)</button>
+        </div>
+    </div>
 </div>
 
-<!-- Right Panel: Output -->
 <div class="response-panel">
-    <h3 style="margin-top:20px;margin-left:25px; color:#e1e1e1;">Response Output (JSON)</h3>
-    <div id="responseOutput"></div>
+    <h3 style="margin-top:20px; margin-left:25px; color:#e1e1e1;">Response Output (JSON)</h3>
+    <pre id="responseOutput"></pre>
 </div>
 
+<!-- IMPORTANT: load YIN before main.js so YinF0Detector is available -->
+<script src="YIN-Algorithm.js"></script>
 <script src="main.js"></script>
-
 </body>
 </html>

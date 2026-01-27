@@ -46,9 +46,17 @@ export const API = {
         }
     },
 
-    /**
-     * Get the audio stream URL
-     */
+    async getVocalData(songId) {
+        try {
+            const response = await fetch(`${BASE_URL}/vocal/${songId}`);
+            if (!response.ok) throw new Error('Failed to fetch vocal data');
+            return await response.json();
+        } catch (error) {
+            console.error("API Error:", error);
+            return null;
+        }
+    },
+
     getAudioStreamUrl(songId) {
         return `${BASE_URL}/play/${songId}`;
     }

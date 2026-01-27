@@ -11,7 +11,7 @@ export class PitchMonitor {
         this.MAX_FREQ = 1050; // C6 (Upper bound for detection only)
         this.BUFFER_SIZE = 2048;
         this.GRAPH_SPEED = 4; // Increased speed for better flow
-        this.VISIBLE_RANGE_SEMITONES = 18; // View height (1.5 octaves) - Makes rows taller
+        this.VISIBLE_RANGE_SEMITONES = 32; // View height (1.5 octaves) - Makes rows taller
 
         this.noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 

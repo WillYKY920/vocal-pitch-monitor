@@ -81,3 +81,18 @@ endpoint: http://localhost:8080/lyrics/{song-id} and returns
 the lyrics should be synced with the song play time
 that's all is needed for now, write me the functions in differe js/ts file seperated by the components
 
+implementation the YIN-algorithm for detecting the fundamental frequency (F0 / pitch) of audio from user vocal stream and compare to the original vocal track file (.wav/.flac) using javascript
+
+for the detection, if there is a significant deviation between the pitch frame and the original samples. display a vertical red line in the pitch graph of where the pitch is off.
+when the play button clicked also get the vocal track data from the song selected. here is the json format:
+{
+fileName: String
+samples: Long
+pitchData: double[]
+}
+then compare the pitchData with real-time vocal stream input
+
+here is the YIN-Algorithm.js for calculating the f0
+and pitchMonitor.js for output display and pitch detecting
+modify the given code if necessary
+

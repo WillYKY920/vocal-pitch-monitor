@@ -3,11 +3,10 @@
 /* --- Main Layout Grid --- */
 main {
     flex: 1;
-    padding: 16px 190px;
+    padding: 12px 80px;
     display: grid;
-    grid-template-rows: 1.5fr 1fr;
-    gap: 16px;
-    height: calc(100vh - var(--header-height));
+    grid-template-rows: 1.6fr 1fr;
+    gap: 12px;
     min-height: 0;
 }
 
@@ -275,7 +274,7 @@ main {
 .bar {
     width: 5px;
     background-color: #fff;
-    border-radius: 3px;
+    border-radius: 5px;
     animation: bounce 1s infinite ease-in-out;
 }
 

@@ -10,27 +10,23 @@ public class Vocaltrack {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "name", unique = true) @JsonProperty("file-name")
+    @Column(name = "name", unique = true)
     private String fileName;
 
-    @Column(name = "size")
-    private Long byteSize;
+    @Column(name = "samples")
+    private long samples;
 
-    @Column(name = "type") @JsonProperty("type")
-    private String contentType;
-
-    @Column(name = "data", nullable = false, columnDefinition = "bytea") @JsonProperty("data")
-    private byte[] vocalData;
+    @Column(name = "pitch-data", nullable = false)
+    private double[] vocalData;
 
     @OneToOne @JoinColumn(name = "song_id")
     private Song song;
 
     public Vocaltrack(){}
 
-    public Vocaltrack(String fileName, Long byteSize, String contentType, byte[] vocalData) {
+    public Vocaltrack(String fileName, long samples, double[] vocalData) {
         this.fileName = fileName;
-        this.byteSize = byteSize;
-        this.contentType = contentType;
+        this.samples = samples;
         this.vocalData = vocalData;
     }
 
@@ -41,14 +37,6 @@ public class Vocaltrack {
         this.id = id;
     }
 
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
     public String getFileName() {
         return fileName;
     }
@@ -57,19 +45,19 @@ public class Vocaltrack {
         this.fileName = fileName;
     }
 
-    public Long getByteSize() {
-        return byteSize;
+    public Long getSamples() {
+        return samples;
     }
 
-    public void setByteSize(Long byteSize) {
-        this.byteSize = byteSize;
+    public void setSamples(Long samples) {
+        this.samples = samples;
     }
 
-    public byte[] getVocalData() {
+    public double[] getVocalData() {
         return vocalData;
     }
 
-    public void setVocalData(byte[] vocalData) {
+    public void setVocalData(double[] vocalData) {
         this.vocalData = vocalData;
     }
 

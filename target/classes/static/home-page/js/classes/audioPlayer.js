@@ -16,6 +16,7 @@ export class AudioPlayer {
         // Shared Audio Context State
         this.audioContext = null;
         this.micStreamNode = null;
+        this.currentVocalData = null;
 
         // UI Elements
         this.playBtn = document.querySelector('.play-btn');
@@ -160,7 +161,9 @@ export class AudioPlayer {
             this.lyricsManager.setLyrics(lyricsResponse.lyrics);
         }
 
-        this.play();
+        this.currentVocalData = await API.getVocalData(song.id);
+
+        await this.play();
     }
 
     async play() {

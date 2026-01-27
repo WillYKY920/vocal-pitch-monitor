@@ -149,4 +149,13 @@ button:hover { opacity: 0.8; }
     white-space: pre;  /* This tells the browser: "Respect my newlines and spaces!" */
 }
 
+#responseOutput {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 16px;
+    line-height: 1.4;
+    padding: 16px;
+}
+
 
