@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
+/**
+ * Service class responsible for handling audio data streaming operations.
+ * Manages the retrieval of audio tracks and writing them directly to the HTTP response stream
+ * to allow clients to play or download audio files.
+ */
 @Service
 public class StreamService {
 
@@ -19,6 +23,16 @@ public class StreamService {
         this.songManagementService = songManagementService;
     }
 
+    /**
+     * Streams the audio data for a specific song directly to the HTTP response.
+     * Retrieves the Audiotrack associated with the given song ID, sets the appropriate
+     * HTTP headers (Content-Type, Content-Length, Content-Disposition), and writes the
+     * binary audio data to the response output stream.
+     *
+     * @param response the {@link HttpServletResponse} to which the audio data is written
+     * @param songId the unique identifier of the song whose audio track is to be streamed
+     * @throws IOException if an input or output exception occurs while writing to the response stream
+     */
     public void streamAudio(HttpServletResponse response, int songId) throws IOException {
 
         Audiotrack audiotrack = songManagementService.findAudioTrackBySongId(songId);

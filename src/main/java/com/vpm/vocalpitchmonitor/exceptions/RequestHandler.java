@@ -14,11 +14,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-//Controller  validation - automatically call when arguments failed validation test
+/**
+ * Controller validation - automatically called when arguments fail validation tests.
+ * Provides global exception handling for the application.
+ */
 @RestControllerAdvice
 public class RequestHandler {
 
-    // exception handler for POST requests
+    /**
+     * Handles exceptions triggered when method arguments fail validation (typically for POST requests).
+     * Extracts specific field errors and messages to construct a detailed error response.
+     *
+     * @param exception the exception thrown when validation on an argument annotated with @Valid fails
+     * @return a ResponseEntity containing a map of field names to error messages and an HTTP 400 (Bad Request) status
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(
             MethodArgumentNotValidException exception
@@ -33,7 +42,14 @@ public class RequestHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    // exception handler for GET requests
+    /**
+     * Handles exceptions when a requested entity cannot be found (typically for GET requests).
+     * Returns a standard error response structure including the timestamp, message, and request path.
+     *
+     * @param exception the exception thrown when an entity is not found in the persistence layer
+     * @param request the current web request during which the exception occurred
+     * @return a ResponseEntity containing error messages and an HTTP 404 (Not Found) status
+     */
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(
             EntityNotFoundException exception,
@@ -47,7 +63,12 @@ public class RequestHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    // exception handler for file IO
+    /**
+     * Handles input/output exceptions that occur during file processing or other IO operations.
+     *
+     * @param exception the exception thrown when an I/O error occurs
+     * @return a ResponseEntity containing error details (timestamp, message) and an HTTP 400 (Bad Request) status
+     */
     @ExceptionHandler(IOException.class)
     public ResponseEntity<Map<String, Object>> handleIOException(
             IOException exception

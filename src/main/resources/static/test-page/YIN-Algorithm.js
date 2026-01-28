@@ -25,9 +25,9 @@ class YinF0Detector {
     /**
      * Creates a new YinF0Detector instance
      * @param {number} sampleRate - Sample rate in Hz (default: 16000)
-     * @param {number} minF0 - Minimum F0 frequency in Hz (default: 80)
-     * @param {number} maxF0 - Maximum F0 frequency in Hz (default: 1000)
-     * @param {number} threshold - Threshold for dip picking (default: 0.1)
+     * @param {number} minF0      - Minimum F0 frequency in Hz (default: 80)
+     * @param {number} maxF0      - Maximum F0 frequency in Hz (default: 1000)
+     * @param {number} threshold  - Threshold for dip picking (default: 0.1)
      */
     constructor(sampleRate = YinF0Detector.DEFAULT_SAMPLE_RATE,
                 minF0 = YinF0Detector.DEFAULT_MIN_F0,

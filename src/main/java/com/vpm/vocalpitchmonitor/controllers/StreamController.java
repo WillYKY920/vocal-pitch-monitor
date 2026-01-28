@@ -25,19 +25,30 @@ public class StreamController {
         this.streamService = streamService;
         this.trackService = trackService;
     }
-    /*
-    http://localhost:8080/play/{song_id}
-    */
+
+     /**
+     * Streams the audio content for a specific song ID to the HTTP response.
+     * <p>Endpoint: GET /play/{song_id}</p>
+     * <p>Note: This method sets the global CURRENTLY_PLAYING_ID to the requested song ID.</p>
+     *
+     * @param songId the ID of the song to stream
+     * @param response the HttpServletResponse to which the audio stream is written
+     * @throws IOException if an I/O error occurs while streaming the audio
+     */
     @GetMapping("/play/{song_id}")
     public void playAudio(
             @PathVariable("song_id") @Valid int songId, HttpServletResponse response) throws IOException {
-
-            CURRENTLY_PLAYING_ID = songId;
-            streamService.streamAudio(response, songId);
+        CURRENTLY_PLAYING_ID = songId;
+        streamService.streamAudio(response, songId);
     }
-    /*
-   http://localhost:8080/play/info
-   */
+
+    /**
+     * Retrieves information about the currently playing audio track.
+     * <p>Endpoint: GET /play/info</p>
+     *
+     * @return an AudiotrackResponseDto containing details of the currently playing track,
+     *         or null if no track is currently playing
+     */
     @GetMapping("/play/info")
     public AudiotrackResponseDto getAudioInfo() {
         if (CURRENTLY_PLAYING_ID == null) {
@@ -45,5 +56,6 @@ public class StreamController {
         }
         return trackService.getAudiotrackDtoById(CURRENTLY_PLAYING_ID);
     }
+
 
 }

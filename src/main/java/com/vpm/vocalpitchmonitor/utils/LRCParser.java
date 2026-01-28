@@ -13,12 +13,26 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class for parsing LRC (LyRiCs) files.
+ * This class provides functionality to extract synchronized lyrics and metadata
+ * from standard LRC file formats. It supports parsing time tags and metadata tags
+ * including title, artist, and duration.
+ */
 public class LRCParser {
 
     private static final Pattern TIME_PATTERN = Pattern.compile("\\[(\\d{2}):(\\d{2})\\.(\\d{2})\\]");
-
     private static final Pattern METADATA_PATTERN = Pattern.compile("\\[([a-zA-Z]+):(.+?)\\]");
 
+    /**
+     * Parses the lyrics content from an LRC file into a structured format.
+     * Reads the file line by line, extracting timestamps and associated lyric text.
+     * Multiple timestamps for the same line are supported.
+     *
+     * @param lrcFile the multipart file containing the LRC data
+     * @return a {@link SyncedLyrics} object containing a list of lyric lines with their corresponding start times in milliseconds
+     * @throws IOException if an error occurs while reading the file stream
+     */
     public static SyncedLyrics parseLyrics(MultipartFile lrcFile) throws IOException {
 
         SyncedLyrics parsedLyrics = new SyncedLyrics();
@@ -42,7 +56,17 @@ public class LRCParser {
         return parsedLyrics;
         }
     }
-
+    /**
+     * Parses metadata (Title, Artist, Duration) from an LRC file.
+     * Scans the file for standard LRC metadata tags:
+     * [ti:Title]
+     * [ar:Artist]
+     * [length:Duration]
+     *
+     * @param lrcFile the multipart file containing the LRC data
+     * @return a {@link SongDto} object populated with the extracted metadata
+     * @throws IOException if an error occurs while reading the file stream
+     */
     public static SongDto parseMetadata(MultipartFile lrcFile) throws IOException {
 
         Container container = new Container();
@@ -63,7 +87,13 @@ public class LRCParser {
         }
     }
 
-    // [**:**.**]
+    /**
+     * Extracts all timestamps found in a single line of an LRC file.
+     * Matches standard LRC time tags in the format [mm:ss.xx] and converts them to total milliseconds.
+     *
+     * @param line the line of text to parse for timestamps
+     * @return a list of integers representing the timestamps in milliseconds
+     */
     public static List<Integer> getTimestamps(String line) {
 
         List<Integer> timestamps = new ArrayList<>();
@@ -82,7 +112,13 @@ public class LRCParser {
         return timestamps;
     }
 
-    // [<key>:<value>]
+    /**
+     * Parses a line for metadata tags and updates the container object if a match is found.
+     * Supports tags: 'ti' (title), 'ar' (artist), and 'length' (duration).
+     *
+     * @param container the internal container used to accumulate metadata during parsing
+     * @param line the line of text to check for metadata tags
+     */
     public static void setMetadata(Container container, String line) {
 
         Matcher matcher = METADATA_PATTERN.matcher(line);
@@ -97,6 +133,12 @@ public class LRCParser {
         }
     }
 
+    /**
+     * Extracts the lyric text from a line.
+     *
+     * @param line the line of text containing timestamps and lyrics
+     * @return the lyric text content, or {@code null} if no text exists after the last tag
+     */
     private static String getLyricText(String line) {
 
         int lastBracket = line.lastIndexOf(']');
@@ -106,6 +148,12 @@ public class LRCParser {
         return null;
     }
 
+    /**
+     * Converts a time string in "mm:ss.xx" format to total milliseconds.
+     *
+     * @param timeString the string representation of time (e.g., "03:45.50")
+     * @return the total time in milliseconds
+     */
     public static int toMilliseconds(String timeString) {
 
         String[] parts = timeString.split(":");
@@ -115,6 +163,7 @@ public class LRCParser {
         return (int)((minutes * 60 + seconds) * 1000);
     }
 
+    //  Internal helper class to hold metadata temporarily during parsing.
     @Data
     private static class Container {
         private String title;
