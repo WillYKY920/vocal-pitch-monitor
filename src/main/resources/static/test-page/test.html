@@ -43,7 +43,7 @@
         <div class="btn-group">
             <button class="btn-get" onclick="getSongById()">GET Song</button>
             <button class="btn-get" onclick="getLyricsById()">GET Lyrics</button>
-            <button class="btn-delete" onclick="deleteSongById()">DELETE</button>
+            <button class="btn-red" onclick="deleteSongById()">DELETE</button>
         </div>
     </div>
 
@@ -98,12 +98,14 @@
         </div>
         <div class="btn-group">
             <button class="btn-get" onclick="getVocalPitchesBySongId()">Get Vocal Pitches (Hz)</button>
+            <button class="btn-red" onclick="toggleRecording()">Record Pitch Stream</button>
         </div>
+
     </div>
 </div>
 
 <div class="response-panel">
-    <h3 style="margin-top:20px; margin-left:25px; color:#e1e1e1;">Response Output (JSON)</h3>
+    <h3 style="margin-top:20px; margin-left:25px; color:#e1e1e1;">Response Output</h3>
     <pre id="responseOutput"></pre>
 </div>
 

@@ -1,18 +1,20 @@
 // js/pitchMonitor.js
 
+import { YinF0Detector } from './YIN-Algorithm.js';
+
 export class PitchMonitor {
+
     constructor(canvasId = 'pitchCanvas') {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
         this.noteDisplay = document.getElementById('note-display');
 
         // Configuration
-        this.MIN_FREQ = 65;   // C2 (Lower bound for detection only)
+        this.MIN_FREQ = 65; // C2 (Lower bound for detection only)
         this.MAX_FREQ = 1050; // C6 (Upper bound for detection only)
         this.BUFFER_SIZE = 2048;
-        this.GRAPH_SPEED = 4; // Increased speed for better flow
-        this.VISIBLE_RANGE_SEMITONES = 32; // View height (1.5 octaves) - Makes rows taller
-
+        this.GRAPH_SPEED = 4;
+        this.VISIBLE_RANGE_SEMITONES = 32;
         this.noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
         // State
@@ -20,6 +22,8 @@ export class PitchMonitor {
         this.analyser = null;
         this.isRunning = false;
 
+        // Pitch Detector
+        this.yinDetector = null;
         this.historyData = [];
         this.maxHistoryLen = 0;
 
@@ -27,9 +31,14 @@ export class PitchMonitor {
         this.currentCenterPitch = 60; // Start at Middle C (C4)
         this.targetCenterPitch = 60;
 
+        // **NEW: Octave jump filtering**
+        this.recentPitches = []; // Store recent valid pitches for median filtering
+        this.medianWindowSize = 5; // Use last 5 detections
+        this.maxJumpSemitones = 12; // Max allowed jump (1 octave)
+        this.lastValidPitch = null;
+
         this.updatePitch = this.updatePitch.bind(this);
         this.resizeCanvas = this.resizeCanvas.bind(this);
-
         this.init();
     }
 
@@ -57,8 +66,13 @@ export class PitchMonitor {
         this.audioContext = audioContext;
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = this.BUFFER_SIZE;
-
         sourceNode.connect(this.analyser);
+
+        this.yinDetector = new YinF0Detector(
+            this.audioContext.sampleRate,
+            this.MIN_FREQ,
+            this.MAX_FREQ
+        );
 
         this.isRunning = true;
         this.updatePitch();
@@ -72,44 +86,6 @@ export class PitchMonitor {
         }
     }
 
-    autoCorrelate(buffer, sampleRate) {
-        let SIZE = buffer.length;
-        let sumOfSquares = 0;
-        for (let i = 0; i < SIZE; i++) {
-            sumOfSquares += buffer[i] * buffer[i];
-        }
-        let rms = Math.sqrt(sumOfSquares / SIZE);
-        if (rms < 0.01) return -1;
-
-        let r1 = 0, r2 = SIZE - 1, thres = 0.2;
-        for (let i = 0; i < SIZE / 2; i++) {
-            if (Math.abs(buffer[i]) < thres) { r1 = i; break; }
-        }
-        for (let i = 1; i < SIZE / 2; i++) {
-            if (Math.abs(buffer[SIZE - i]) < thres) { r2 = SIZE - i; break; }
-        }
-        buffer = buffer.slice(r1, r2);
-        SIZE = buffer.length;
-
-        let c = new Array(SIZE).fill(0);
-        for (let i = 0; i < SIZE; i++) {
-            for (let j = 0; j < SIZE - i; j++) {
-                c[i] = c[i] + buffer[j] * buffer[j + i];
-            }
-        }
-        let d = 0; while (c[d] > c[d + 1]) d++;
-        let maxval = -1, maxpos = -1;
-        for (let i = d; i < SIZE; i++) {
-            if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
-        }
-        let T0 = maxpos;
-        let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
-        let a = (x1 + x3 - 2 * x2) / 2;
-        let b = (x3 - x1) / 2;
-        if (a) T0 = T0 - b / (2 * a);
-        return sampleRate / T0;
-    }
-
     frequencyToMidi(frequency) {
         return 69 + 12 * Math.log2(frequency / 440);
     }
@@ -120,27 +96,83 @@ export class PitchMonitor {
         return this.noteStrings[noteIndex] + " " + octave;
     }
 
+// **NEW: Median filter to smooth out octave jumps**
+    getMedianPitch(pitches) {
+        if (pitches.length === 0) return null;
+        const sorted = [...pitches].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 === 0
+            ? (sorted[mid - 1] + sorted[mid]) / 2
+            : sorted[mid];
+    }
+
+// **NEW: Check if pitch jump is an octave error**
+    correctOctaveJump(midiFloat) {
+        if (this.lastValidPitch === null) return midiFloat;
+
+        const diff = midiFloat - this.lastValidPitch;
+        const absDiff = Math.abs(diff);
+
+        // If jump is close to 1 or 2 octaves (11-13 or 23-25 semitones), correct it
+        if (absDiff >= 11 && absDiff <= 13) {
+            // Likely 1-octave error
+            return diff > 0 ? midiFloat - 12 : midiFloat + 12;
+        } else if (absDiff >= 23 && absDiff <= 25) {
+            // Likely 2-octave error
+            return diff > 0 ? midiFloat - 24 : midiFloat + 24;
+        }
+
+        return midiFloat;
+    }
+
     updatePitch() {
         if (!this.isRunning) return;
 
         const buffer = new Float32Array(this.analyser.fftSize);
         this.analyser.getFloatTimeDomainData(buffer);
 
-        const frequency = this.autoCorrelate(buffer, this.audioContext.sampleRate);
+        let frequency = 0;
+        if (this.yinDetector) {
+            frequency = this.yinDetector.estimateF0(buffer);
+        }
 
-        if (frequency !== -1 && frequency > this.MIN_FREQ && frequency < this.MAX_FREQ) {
-            const midiFloat = this.frequencyToMidi(frequency);
-            if (this.noteDisplay) this.noteDisplay.innerText = this.midiToNoteName(midiFloat);
+        if (frequency > 0 && frequency > this.MIN_FREQ && frequency < this.MAX_FREQ) {
+            let midiFloat = this.frequencyToMidi(frequency);
 
-            // Update target to center this note
-            this.targetCenterPitch = midiFloat;
+            // **NEW: Apply octave jump correction**
+            midiFloat = this.correctOctaveJump(midiFloat);
 
-            this.historyData.push({ val: midiFloat, active: true });
+            // **NEW: Add to recent pitches buffer**
+            this.recentPitches.push(midiFloat);
+            if (this.recentPitches.length > this.medianWindowSize) {
+                this.recentPitches.shift();
+            }
+
+            // **NEW: Use median of recent pitches**
+            const smoothedPitch = this.getMedianPitch(this.recentPitches);
+
+            // **NEW: Only accept if jump is reasonable**
+            if (this.lastValidPitch === null ||
+                Math.abs(smoothedPitch - this.lastValidPitch) < this.maxJumpSemitones) {
+
+                this.lastValidPitch = smoothedPitch;
+
+                if (this.noteDisplay) {
+                    this.noteDisplay.innerText = this.midiToNoteName(smoothedPitch);
+                }
+
+                this.targetCenterPitch = smoothedPitch;
+                this.historyData.push({ val: smoothedPitch, active: true });
+            } else {
+                // Jump too large, treat as inactive
+                this.historyData.push({ val: null, active: false });
+            }
         } else {
             this.historyData.push({ val: null, active: false });
         }
 
         if (this.historyData.length > this.maxHistoryLen) this.historyData.shift();
+
         this.draw();
         requestAnimationFrame(this.updatePitch);
     }
@@ -149,86 +181,74 @@ export class PitchMonitor {
         if (!this.ctx) return;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // --- Smooth Camera Movement ---
-        // Lerp current center towards target (0.05 is the smoothing factor)
-        // If no note is detected, we stay at the last known pitch
+        // Smooth Camera Movement
         this.currentCenterPitch += (this.targetCenterPitch - this.currentCenterPitch) * 0.05;
 
-        // Calculate visible bounds based on dynamic center
         const halfRange = this.VISIBLE_RANGE_SEMITONES / 2;
         const minMidi = this.currentCenterPitch - halfRange;
         const maxMidi = this.currentCenterPitch + halfRange;
         const range = maxMidi - minMidi;
 
-        // Function to map MIDI value to Y position
         const getY = (midiVal) => {
             return this.canvas.height - ((midiVal - minMidi) / range) * this.canvas.height;
         };
 
-        // --- Draw Grid ---
+        // Draw Grid
         this.ctx.font = "14px sans-serif";
         this.ctx.textAlign = "left";
         this.ctx.textBaseline = "middle";
 
-        // We extend the loop slightly beyond view to ensure lines entering/leaving don't pop
         const startGrid = Math.floor(minMidi);
         const endGrid = Math.ceil(maxMidi);
 
         for (let m = startGrid; m <= endGrid; m++) {
             const name = this.midiToNoteName(m);
-            const isC = name.startsWith("C "); // C notes
+            const isC = name.startsWith("C ");
             const isSharp = name.includes("#");
             const y = getY(m);
 
-            // Don't draw sharps as lines to keep it clean, only naturals
             if (!isSharp) {
                 this.ctx.beginPath();
                 this.ctx.moveTo(0, y);
                 this.ctx.lineTo(this.canvas.width, y);
 
-                // Style
                 if (isC) {
                     this.ctx.lineWidth = 2;
-                    this.ctx.strokeStyle = "#666"; // Brighter for C
+                    this.ctx.strokeStyle = "#666";
                 } else {
                     this.ctx.lineWidth = 1;
-                    this.ctx.strokeStyle = "#333"; // Dim for others
+                    this.ctx.strokeStyle = "#333";
                 }
-                this.ctx.stroke();
 
-                // Labels
+                this.ctx.stroke();
                 this.ctx.fillStyle = isC ? "#DDD" : "#777";
                 this.ctx.fillText(name, 10, y);
             }
         }
 
-        // --- Draw Trace ---
+        // Draw Trace
         if (this.historyData.length > 1) {
             this.ctx.beginPath();
             this.ctx.lineWidth = 4;
-            this.ctx.strokeStyle = "#FFFF00"; // Yellow
+            this.ctx.strokeStyle = "#FFFF00";
             this.ctx.lineCap = "round";
             this.ctx.lineJoin = "round";
-            // Glow effect
             this.ctx.shadowBlur = 10;
             this.ctx.shadowColor = "#FFFF00";
 
             let started = false;
 
             for (let i = 0; i < this.historyData.length; i++) {
-                // historyData is old -> new. Loop backwards to draw right -> left
                 const point = this.historyData[this.historyData.length - 1 - i];
                 const x = this.canvas.width - (i * this.GRAPH_SPEED);
 
-                if (x < -10) break; // Off screen
+                if (x < -10) break;
 
                 if (point.active) {
                     const y = getY(point.val);
 
-                    // Don't draw if point is way off screen (optimization)
-                    // but allow some buffer so lines don't clip abruptly
                     if (y < -50 || y > this.canvas.height + 50) {
-                        if (started) started = false; // Break line if we go way off
+                        if (started) started = false;
                         continue;
                     }
 
@@ -244,23 +264,23 @@ export class PitchMonitor {
                         }
                     }
                 } else {
-                    started = false; // Break line on silence
+                    started = false;
                 }
             }
-            this.ctx.stroke();
 
-            // Reset shadow
+            this.ctx.stroke();
             this.ctx.shadowBlur = 0;
-
-            // Draw "Current Note" indicator line in the center
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
-            this.ctx.lineWidth = 1;
-            this.ctx.setLineDash([5, 5]);
-            this.ctx.moveTo(0, this.canvas.height / 2);
-            this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
-            this.ctx.stroke();
-            this.ctx.setLineDash([]);
         }
+
+        // Draw center indicator
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+        this.ctx.lineWidth = 1;
+        this.ctx.setLineDash([5, 5]);
+        this.ctx.moveTo(0, this.canvas.height / 2);
+        this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
     }
+
 }

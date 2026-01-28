@@ -9,9 +9,7 @@ import java.io.IOException;
 public class HomeController {
 
     /**
-     * Home page of the web application
-     * <p>Endpoint: GET /vpm</p>
-     *
+     * Home page of the web application. Endpoint: GET /vpm
      * @return the home.html page
      */
     @GetMapping("/vpm")
@@ -20,12 +18,10 @@ public class HomeController {
     }
 
     /**
-     * Test page of the web application
-     * <p>Endpoint: GET /test</p>
-     *
+     * Test page of the web application. Endpoint: GET /test
      * @return the test.html page
      */
-    @GetMapping("/vpm")
+    @GetMapping("/test")
     public String testPage() {
         return "redirect:test-page/test.html";
     }

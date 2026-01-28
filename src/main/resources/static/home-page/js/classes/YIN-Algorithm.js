@@ -25,9 +25,9 @@ export class YinF0Detector {
     /**
      * Creates a new YinF0Detector instance
      * @param {number} sampleRate - Sample rate in Hz (default: 16000)
-     * @param {number} minF0 - Minimum F0 frequency in Hz (default: 80)
-     * @param {number} maxF0 - Maximum F0 frequency in Hz (default: 1000)
-     * @param {number} threshold - Threshold for dip picking (default: 0.1)
+     * @param {number} minF0      - Minimum F0 frequency in Hz (default: 80)
+     * @param {number} maxF0      - Maximum F0 frequency in Hz (default: 1000)
+     * @param {number} threshold  - Threshold for dip picking (default: 0.1)
      */
     constructor(sampleRate = YinF0Detector.DEFAULT_SAMPLE_RATE,
                 minF0 = YinF0Detector.DEFAULT_MIN_F0,
@@ -118,81 +118,71 @@ export class YinF0Detector {
      */
     computeDifferenceFunction(frame, maxLag) {
         const len = frame.length;
-
-        // 1. Calculate power sums (prefix sum of squares)
-        // powerSum[k] = sum_{i=0}^{k-1} x[i]^2
-        const powerSum = new Float64Array(len + 1);
-        powerSum[0] = 0.0;
-        for (let i = 0; i < len; i++) {
-            powerSum[i + 1] = powerSum[i] + frame[i] * frame[i];
-        }
-
-        // 2. Calculate Autocorrelation using FFT
-        // Find next power of 2 >= 2*len to avoid circular convolution aliasing
-        let fftSize = 1;
-        while (fftSize < len * 2) {
-            fftSize <<= 1;
-        }
-
-        // Pad with zeros
-        const padded = new Float64Array(fftSize);
-        for (let i = 0; i < len; i++) {
-            padded[i] = frame[i];
-        }
-
-        // Perform FFT
-        const fftResult = this.fft(padded);
-
-        // Compute Power Spectrum P(f) = |X(f)|^2
-        for (let i = 0; i < fftResult.length; i += 2) {
-            const real = fftResult[i];
-            const imag = fftResult[i + 1];
-            const magnitudeSq = real * real + imag * imag;
-            fftResult[i] = magnitudeSq;
-            fftResult[i + 1] = 0;
-        }
-
-        // Inverse FFT to get autocorrelation
-        const autocorr = this.ifft(fftResult);
-
-        // 3. Assemble Difference Function
         const diff = new Float64Array(maxLag + 1);
+
+        // d(0) is not used by YIN; keep it 0
+        diff[0] = 0;
+
         for (let tau = 1; tau <= maxLag; tau++) {
-            // Term 1: sum_{j=0}^{len-1-tau} x[j]^2
-            const term1 = powerSum[len - tau] - powerSum[0];
-
-            // Term 2: sum_{j=tau}^{len-1} x[j]^2
-            const term2 = powerSum[len] - powerSum[tau];
-
-            // Term 3: Autocorrelation at lag tau
-            const term3 = 2 * autocorr[tau * 2]; // Real part only
-
-            diff[tau] = term1 + term2 - term3;
-
-            // Fix potential floating point errors slightly below zero
-            if (diff[tau] < 0) diff[tau] = 0;
+            let sum = 0.0;
+            const limit = len - tau;
+            for (let i = 0; i < limit; i++) {
+                const d = frame[i] - frame[i + tau];
+                sum += d * d;
+            }
+            diff[tau] = sum;
         }
 
         return diff;
     }
 
     /**
+     * Octave-error correction: if we picked tau but 2*tau is similarly good,
+     * prefer the larger period (lower frequency) to avoid doubling.
+     * @private
+     */
+    octaveCorrection(cmndf, tau, minLag, maxLag) {
+        const idx = tau - minLag;
+        if (idx < 0 || idx >= cmndf.length) return tau;
+
+        const v = cmndf[idx];
+        const tau2 = tau * 2;
+
+        if (tau2 <= maxLag) {
+            const idx2 = tau2 - minLag;
+            if (idx2 >= 0 && idx2 < cmndf.length) {
+                const v2 = cmndf[idx2];
+
+                // If 2*tau is also a strong minimum, it often means tau was a harmonic (octave up).
+                // Tune these constants if needed.
+                const closeEnough = (v2 <= v * 1.15);
+                const alsoGood = (v2 < 0.20); // slightly looser than typical threshold
+                if (closeEnough && alsoGood) return tau2;
+            }
+        }
+
+        return tau;
+    }
+
+    /**
      * Finds the first local minimum below the threshold
+     * + octave correction.
      * @private
      */
     findBestLag(cmndf, minLag, maxLag) {
+        // First threshold crossing -> local minimum (classic YIN)
         for (let i = 0; i < cmndf.length; i++) {
             if (cmndf[i] < this.threshold) {
-                // Found a dip below threshold, now find the local minimum
                 let bestIndex = i;
                 while (bestIndex + 1 < cmndf.length && cmndf[bestIndex + 1] < cmndf[bestIndex]) {
                     bestIndex++;
                 }
-                return minLag + bestIndex;
+                const tau = minLag + bestIndex;
+                return this.octaveCorrection(cmndf, tau, minLag, maxLag);
             }
         }
 
-        // Fallback: Global minimum if no threshold crossing found
+        // Fallback: global minimum
         let minIndex = 0;
         let minVal = cmndf[0];
         for (let i = 1; i < cmndf.length; i++) {
@@ -202,9 +192,12 @@ export class YinF0Detector {
             }
         }
 
-        // Reject if global minimum is still too poor (weak periodicity)
-        return (minVal > 0.4) ? 0 : minLag + minIndex;
+        if (minVal > 0.4) return 0;
+
+        const tau = minLag + minIndex;
+        return this.octaveCorrection(cmndf, tau, minLag, maxLag);
     }
+
 
     /**
      * Refines the integer lag using parabolic interpolation

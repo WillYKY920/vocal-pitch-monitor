@@ -81,6 +81,15 @@ function getAllSongs() {
         .catch(err => setResponseOutput(String(err)));
 }
 
+function getVocalPitchesBySongId() {
+    // 1. Get the ID from the specific input field in the Visualization card
+    const id = document.getElementById('songIdInput2').value;
+    if (!id) return alert('Please enter a Song ID');
+    fetch(`${BASE_URL}/vocal/${id}`)
+        .then(handleResponse) // Uses your existing response handler to display the JSON
+        .catch(err => setResponseOutput(String(err)));
+}
+
 // --- Upload Endpoints ---
 function uploadLrc() {
     const fileInput = document.getElementById('lrcFile');
@@ -163,14 +172,14 @@ async function extractPitchData(file) {
     const yinDetector = new YinF0Detector(sampleRate, 80, 1000, 0.1);
 
     // 4. Processing parameters
-    const windowSize = 2048; // Frame size (approx 46ms at 44.1kHz)
+    const bufferSize = 2048; // Frame size (approx 46ms at 44.1kHz)
     const hopSize = 512;     // 75% overlap for smoother pitch contour
     const pitchData = [];
 
     // 5. Iterate through audio frames
-    for (let i = 0; i < totalSamples - windowSize; i += hopSize) {
+    for (let i = 0; i < totalSamples - bufferSize; i += hopSize) {
         // Extract frame
-        const frame = pcmData.slice(i, i + windowSize);
+        const frame = pcmData.slice(i, i + bufferSize);
 
         // Estimate pitch
         const pitch = yinDetector.estimateF0(frame);
@@ -187,16 +196,94 @@ async function extractPitchData(file) {
     };
 }
 
-function getVocalPitchesBySongId() {
-    // 1. Get the ID from the specific input field in the Visualization card
-    const id = document.getElementById('songIdInput2').value;
+// --- Real-time Vocal Pitch Recording ---
+let recording = { ctx: null, stream: null, node: null };
+let pitchList = [];
 
-    // 2. Validation
-    if (!id) return alert('Please enter a Song ID');
-
-    // 3. Fetch the VocalTrackDto (GET request)
-    // Note: This assumes your backend has a corresponding @GetMapping("/{id}")
-    fetch(`${BASE_URL}/vocal/${id}`)
-        .then(handleResponse) // Uses your existing response handler to display the JSON
-        .catch(err => setResponseOutput(String(err)));
+function toggleRecording() {
+    if (recording.ctx) {
+        stopVocalPitchRecording();
+    } else {
+        startVocalPitchRecording();
+    }
 }
+
+// Helper to update button visual state
+function updateRecordButtonState(isRecording) {
+    const buttons = document.getElementsByTagName('button');
+    for (let btn of buttons) {
+        if (btn.textContent.includes('Record Pitch Stream') || btn.textContent.includes('Stop Recording')) {
+            if (isRecording) {
+                btn.textContent = "Stop Recording";
+                btn.style.backgroundColor = "#ff4444"; // Visual feedback (Red)
+            } else {
+                btn.textContent = "Record Pitch Stream";
+                btn.style.backgroundColor = ""; // Reset to default
+            }
+            break;
+        }
+    }
+}
+
+async function startVocalPitchRecording() {
+    if (recording.ctx) return;
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = ctx.createMediaStreamSource(stream);
+        const node = ctx.createScriptProcessor(2048, 1, 1);
+        const yin = new YinF0Detector(ctx.sampleRate, 80, 1000, 0.15);
+
+        recording = { ctx, stream, node };
+        pitchList = [];
+
+        node.onaudioprocess = (e) => {
+            const inputData = e.inputBuffer.getChannelData(0);
+            const pitch = yin.estimateF0(inputData);
+            pitchList.push(pitch);
+
+            // Live Display: Show count + last 10 pitches
+            const recent = pitchList.slice(-10).map((p, i) =>
+                `Frame ${pitchList.length - 10 + i + 1}: ${p.toFixed(2)} Hz`
+            ).join('\n');
+
+            setResponseOutput(`Recording... Total Frames: ${pitchList.length}\n\nRecent:\n${recent}`);
+        };
+
+        source.connect(node);
+        node.connect(ctx.destination);
+
+        updateRecordButtonState(true);
+
+    } catch (err) {
+        setResponseOutput(`Error: ${err.message}`);
+    }
+}
+
+function stopVocalPitchRecording() {
+    if (!recording.ctx) return;
+
+    recording.node.disconnect();
+    recording.ctx.close();
+    recording.stream.getTracks().forEach(track => track.stop());
+    recording = { ctx: null, stream: null, node: null };
+
+    const fullList = pitchList.map((p, i) => `Frame ${i + 1}: ${p.toFixed(2)} Hz`).join('\n');
+    setResponseOutput(`Recording Stopped.\n\nFull Pitch List:\n${fullList}`);
+
+    updateRecordButtonState(false);
+}
+
+// Auto-attach event listener when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Find the button with text "Record Pitch Stream"
+    const buttons = document.getElementsByTagName('button');
+    for (let btn of buttons) {
+        if (btn.textContent.trim() === 'Record Pitch Stream') {
+            btn.onclick = toggleRecording;
+            break;
+        }
+    }
+});
+
