@@ -161,12 +161,8 @@ async function extractPitchData(file) {
     const originalSampleRate = tempBuffer.sampleRate;
     await tempContext.close();
 
-    console.log(`Detected sample rate from AudioContext: ${originalSampleRate} Hz`);
-    console.log(`WARNING: Browser may have resampled the file!`);
-
     // STEP 2: Parse WAV header to get ACTUAL file sample rate
     const actualSampleRate = getWavSampleRate(arrayBuffer);
-    console.log(`Actual WAV file sample rate: ${actualSampleRate} Hz`);
 
     // STEP 3: Create AudioContext with the correct sample rate
     const audioContext = new (window.AudioContext || window.webkitAudioContext)({
@@ -182,19 +178,18 @@ async function extractPitchData(file) {
     console.log(`Total samples: ${totalSamples}`);
     console.log(`Duration: ${(totalSamples / sampleRate).toFixed(2)}s`);
 
-    // Stricter threshold for vocal detection
     const yinDetector = new YinF0Detector(sampleRate, 80, 1000, 0.20);
 
     const bufferSize = 2048;
     const hopSize = 512;
-    const pitchData = [];
 
-    // Higher RMS threshold to ignore background noise
+    const pitchData = [];
     const RMS_THRESHOLD = 0.03;
+    const totalFrames = Math.floor((totalSamples - bufferSize) / hopSize);
+    let frameCount = 0;
 
     for (let i = 0; i < totalSamples - bufferSize; i += hopSize) {
         const frame = pcmData.slice(i, i + bufferSize);
-
         const rms = Math.sqrt(
             frame.reduce((sum, val) => sum + val * val, 0) / frame.length
         );
@@ -208,28 +203,32 @@ async function extractPitchData(file) {
         }
 
         pitchData.push(pitch);
+        frameCount++;
+
+        // Update progress every 5%
+        const currentPercent = Math.floor((frameCount / totalFrames) * 100);
+        if (currentPercent <= 100) {
+            setResponseOutput(
+                `Extracting pitch data... ${currentPercent}%\n\n` +
+                `Progress: ${frameCount}/${totalFrames} frames\n`
+            );
+            await new Promise(resolve => setTimeout(resolve, 0));
+        }
+
     }
 
-    // Clean up
     await audioContext.close();
 
-    const audioDuration = totalSamples / sampleRate;
-    const pitchDataDuration = (pitchData.length * hopSize) / sampleRate;
-
-    console.log(`Extraction complete:
-- File: ${file.name}
-- Sample Rate: ${sampleRate} Hz
-- Total Samples: ${totalSamples}
-- Pitch Frames: ${pitchData.length}
-- Hop Size: ${hopSize} samples
-- Pitch Data Duration: ${pitchDataDuration.toFixed(2)}s (${pitchDataDuration})`);
+    let cleanedData = removeOctaveErrors(pitchData, 5);
+    cleanedData = medianFilter(cleanedData, 5);
+    cleanedData = removeStatisticalOutliers(cleanedData, 11, 2.5);
 
     return {
         fileName: file.name,
         samples: totalSamples,
         sampleRate: sampleRate,
         hopSize: hopSize,
-        pitchData: pitchData
+        pitchData: cleanedData  // Use cleaned data instead
     };
 }
 
@@ -253,14 +252,9 @@ function getWavSampleRate(arrayBuffer) {
         console.warn('Not a valid WAV file, using default 44100 Hz');
         return 44100;
     }
-
-    // Sample rate is at byte offset 24 (little-endian)
     const sampleRate = dataView.getUint32(24, true);
-
     return sampleRate;
 }
-
-
 // --- Real-time Vocal Pitch Recording ---
 let recording = { ctx: null, stream: null, node: null };
 let pitchList = [];
@@ -352,3 +346,113 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+/**
+ * Remove octave errors by detecting unrealistic pitch jumps
+ * @param {number[]} pitchData - Array of pitch values
+ * @param {number} maxJumpSemitones - Maximum allowed pitch jump in semitones (default: 5)
+ * @returns {number[]} Corrected pitch data
+ */
+function removeOctaveErrors(pitchData, maxJumpSemitones = 5) {
+    if (pitchData.length === 0) return pitchData;
+
+    const filtered = [pitchData[0]];
+    const maxJumpRatio = Math.pow(2, maxJumpSemitones / 12);
+
+    for (let i = 1; i < pitchData.length; i++) {
+        const current = pitchData[i];
+        const previous = filtered[i - 1];
+
+        if (current === 0 || previous === 0) {
+            filtered.push(current);
+            continue;
+        }
+
+        const ratio = current / previous;
+
+        // Check if jump is too large
+        if (ratio > maxJumpRatio || ratio < 1 / maxJumpRatio) {
+            // Check octave multiples (2x, 0.5x, 3x, 0.33x, etc.)
+            const octaveMultiples = [0.5, 0.33, 0.25, 2, 3, 4];
+            let corrected = current;
+
+            for (const mult of octaveMultiples) {
+                const candidate = current * mult;
+                const candidateRatio = candidate / previous;
+                if (candidateRatio <= maxJumpRatio && candidateRatio >= 1 / maxJumpRatio) {
+                    corrected = candidate;
+                    break;
+                }
+            }
+
+            filtered.push(corrected);
+        } else {
+            filtered.push(current);
+        }
+    }
+
+    return filtered;
+}
+
+/**
+ * Apply median filter to remove pitch outliers
+ * @param {number[]} pitchData - Array of pitch values
+ * @param {number} windowSize - Filter window size (use odd number, e.g., 5 or 7)
+ * @returns {number[]} Filtered pitch data
+ */
+function medianFilter(pitchData, windowSize = 5) {
+    const halfWindow = Math.floor(windowSize / 2);
+    const filtered = [];
+
+    for (let i = 0; i < pitchData.length; i++) {
+        const start = Math.max(0, i - halfWindow);
+        const end = Math.min(pitchData.length, i + halfWindow + 1);
+        const window = pitchData.slice(start, end).filter(p => p > 0);
+
+        if (window.length > 0) {
+            window.sort((a, b) => a - b);
+            filtered.push(window[Math.floor(window.length / 2)]);
+        } else {
+            filtered.push(pitchData[i]);
+        }
+    }
+
+    return filtered;
+}
+
+/**
+ * Remove statistical outliers based on local standard deviation
+ * @param {number[]} pitchData - Array of pitch values
+ * @param {number} windowSize - Window size for local statistics
+ * @param {number} threshold - Number of standard deviations (default: 2.5)
+ * @returns {number[]} Filtered pitch data
+ */
+function removeStatisticalOutliers(pitchData, windowSize = 11, threshold = 2.5) {
+    const halfWindow = Math.floor(windowSize / 2);
+    const filtered = [];
+
+    for (let i = 0; i < pitchData.length; i++) {
+        const start = Math.max(0, i - halfWindow);
+        const end = Math.min(pitchData.length, i + halfWindow + 1);
+        const window = pitchData.slice(start, end).filter(p => p > 0);
+
+        if (window.length < 3) {
+            filtered.push(pitchData[i]);
+            continue;
+        }
+
+        const mean = window.reduce((a, b) => a + b, 0) / window.length;
+        const variance = window.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / window.length;
+        const stdDev = Math.sqrt(variance);
+
+        const current = pitchData[i];
+        if (current > 0 && Math.abs(current - mean) > threshold * stdDev) {
+            // Replace outlier with median
+            const sorted = [...window].sort((a, b) => a - b);
+            filtered.push(sorted[Math.floor(sorted.length / 2)]);
+        } else {
+            filtered.push(current);
+        }
+    }
+
+    return filtered;
+}

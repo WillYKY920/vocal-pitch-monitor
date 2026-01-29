@@ -2,7 +2,6 @@
 import { ErrorDetector } from '../../algorithms/errorDetector.js';
 import { YinF0Detector } from '../../algorithms/pitchDetector.js';
 
-
 export class PitchMonitor {
 
     constructor(canvasId = 'pitchCanvas') {
@@ -12,6 +11,7 @@ export class PitchMonitor {
         this.errorDetector = new ErrorDetector();
         this.errorMarkers = []; // Store error positions relative to history
         this.audioElement = null; // ADD: Store reference to audio element
+
         this.referencePitchData = null; // Sample vocal data in MIDI
         this.sampleRate = 44100;
         this.hopSize = 512;
@@ -23,8 +23,6 @@ export class PitchMonitor {
         this.GRAPH_SPEED = 4;
         this.VISIBLE_RANGE_SEMITONES = 32;
         this.noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-        this.referenceHistoryData = [];
 
         // State
         this.audioContext = null;
