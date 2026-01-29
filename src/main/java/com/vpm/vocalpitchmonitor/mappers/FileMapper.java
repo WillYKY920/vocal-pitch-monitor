@@ -34,6 +34,8 @@ public class FileMapper {
         entity.setFileName(vocalTrackDto.fileName());
         entity.setSamples(vocalTrackDto.samples());
         entity.setVocalData(vocalTrackDto.pitchData());
+        entity.setSampleRate(vocalTrackDto.sampleRate());
+        entity.setHopSize(vocalTrackDto.hopSize());
         entity.setSong(song);
 
         return entity;
@@ -43,6 +45,8 @@ public class FileMapper {
         return new VocalTrackDto(
                 vocaltrack.getFileName(),
                 vocaltrack.getSamples(),
+                vocaltrack.getSampleRate(),
+                vocaltrack.getHopSize(),
                 vocaltrack.getVocalData()
         );
     }

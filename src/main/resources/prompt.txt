@@ -92,7 +92,7 @@ pitchData: double[]
 }
 then compare the pitchData with real-time vocal stream input
 
-here is the YIN-Algorithm.js for calculating the f0
+here is the pitchDetector.js for calculating the f0
 and pitchMonitor.js for output display and pitch detecting
 modify the given code if necessary
 

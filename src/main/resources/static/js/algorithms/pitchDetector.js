@@ -12,7 +12,7 @@
  * The Journal of the Acoustical Society of America, 111(4), 1917-1930.
  */
 
-class YinF0Detector {
+export class YinF0Detector {
 
     /**
      * Default parameters optimized for vocal pitch detection (80Hz - 1000Hz)
@@ -20,7 +20,7 @@ class YinF0Detector {
     static DEFAULT_MIN_F0 = 80.0;
     static DEFAULT_MAX_F0 = 1000.0;
     static DEFAULT_THRESHOLD = 0.1; // Absolute threshold for dip picking
-    static DEFAULT_SAMPLE_RATE = 16000;
+    static DEFAULT_SAMPLE_RATE = 44100; // 44.1k Hz
 
     /**
      * Creates a new YinF0Detector instance
@@ -182,10 +182,21 @@ class YinF0Detector {
             }
         }
 
-        // No fallback - if nothing crosses threshold, return 0
-        return 0;
-    }
+        // Fallback: global minimum
+        let minIndex = 0;
+        let minVal = cmndf[0];
+        for (let i = 1; i < cmndf.length; i++) {
+            if (cmndf[i] < minVal) {
+                minVal = cmndf[i];
+                minIndex = i;
+            }
+        }
 
+        if (minVal > 0.4) return 0;
+
+        const tau = minLag + minIndex;
+        return this.octaveCorrection(cmndf, tau, minLag, maxLag);
+    }
 
 
     /**

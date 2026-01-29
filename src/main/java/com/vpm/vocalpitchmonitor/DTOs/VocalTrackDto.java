@@ -6,6 +6,10 @@ public record VocalTrackDto(
 
         Long samples,
 
+        Long sampleRate,
+
+        int hopSize,
+
         double[] pitchData
 
 ){

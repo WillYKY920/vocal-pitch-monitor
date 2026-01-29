@@ -1,6 +1,8 @@
 package com.vpm.vocalpitchmonitor.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Represents processed vocal pitch data extracted from a song.
@@ -23,7 +25,8 @@ import jakarta.persistence.*;
 public class Vocaltrack {
 
     // Unique identifier for the vocal track.
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     // Filename of the vocal track source.
@@ -34,26 +37,36 @@ public class Vocaltrack {
     @Column(name = "samples")
     private long samples;
 
+    @Column(name = "sample-rate")
+    private long sampleRate;
+
+    @Column(name = "hop-size")
+    private int hopSize;
+
     // Array of pitch values (frequencies) extracted from the vocals.
     @Column(name = "pitch-data", nullable = false)
     private double[] vocalData;
 
     // The song associated with this vocal track.
-    @OneToOne @JoinColumn(name = "song_id")
+    @OneToOne
+    @JoinColumn(name = "song_id")
     private Song song;
 
-    public Vocaltrack(){} // No argument constructor
+    public Vocaltrack() {
+    } // No argument constructor
 
-    public Vocaltrack(String fileName, long samples, double[] vocalData) {
+    public Vocaltrack(String fileName, long samples, long sampleRate, int hopSize, double[] vocalData) {
         this.fileName = fileName;
         this.samples = samples;
+        this.sampleRate = sampleRate;
+        this.hopSize = hopSize;
         this.vocalData = vocalData;
     }
 
-    // Getters & Setters
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -66,12 +79,28 @@ public class Vocaltrack {
         this.fileName = fileName;
     }
 
-    public Long getSamples() {
+    public long getSamples() {
         return samples;
     }
 
-    public void setSamples(Long samples) {
+    public void setSamples(long samples) {
         this.samples = samples;
+    }
+
+    public long getSampleRate() {
+        return sampleRate;
+    }
+
+    public void setSampleRate(long sampleRate) {
+        this.sampleRate = sampleRate;
+    }
+
+    public int getHopSize() {
+        return hopSize;
+    }
+
+    public void setHopSize(int hopSize) {
+        this.hopSize = hopSize;
     }
 
     public double[] getVocalData() {
@@ -90,3 +119,6 @@ public class Vocaltrack {
         this.song = song;
     }
 }
+
+    // Getters & Setters
+
