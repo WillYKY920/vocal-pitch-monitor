@@ -2,11 +2,12 @@
  * AudioFilter.js
  * Handles pitch smoothing and octave error correction.
  */
+
 export class AudioFilter {
-    constructor(medianWindowSize = 5, maxJumpSemitones = 12) {
+    constructor(medianWindowSize = 5, maxJumpSemitones = 24) {
         this.recentPitches = []; // Store recent valid pitches for median filtering
         this.medianWindowSize = medianWindowSize;
-        this.maxJumpSemitones = maxJumpSemitones;
+        this.maxJumpSemitones = maxJumpSemitones; // Increased to 24 (2 octaves)
         this.lastValidPitch = null;
     }
 
@@ -63,15 +64,28 @@ export class AudioFilter {
         // 3. Apply median filter
         const smoothedPitch = this.getMedianPitch(this.recentPitches);
 
-        // 4. Validate against maximum allowed jump
-        if (this.lastValidPitch === null ||
-            Math.abs(smoothedPitch - this.lastValidPitch) < this.maxJumpSemitones) {
-
+        // 4. Relaxed validation: allow larger jumps or reset if gap is huge
+        if (this.lastValidPitch === null) {
             this.lastValidPitch = smoothedPitch;
             return smoothedPitch;
         }
 
-        return null;
+        const jump = Math.abs(smoothedPitch - this.lastValidPitch);
+
+        // If jump is reasonable (< maxJumpSemitones), accept it
+        if (jump < this.maxJumpSemitones) {
+            this.lastValidPitch = smoothedPitch;
+            return smoothedPitch;
+        }
+
+        // If jump is huge (> 36 semitones / 3 octaves), it's likely noise - reject
+        if (jump > 36) {
+            return null;
+        }
+
+        // For jumps between 24-36 semitones, accept but don't update lastValidPitch
+        // This allows the visualization to continue without enforcing strict continuity
+        return smoothedPitch;
     }
 
     /**

@@ -29,7 +29,6 @@ public class StreamController {
      /**
      * Streams the audio content for a specific song ID to the HTTP response.
      * <p>Endpoint: GET /play/{song_id}</p>
-     * This method sets the CURRENTLY_PLAYING_ID to the requested song ID.
      *
      * @param songId the ID of the song to stream
      * @param response the HttpServletResponse to which the audio stream is written

@@ -20,7 +20,7 @@ export class YinF0Detector {
     static DEFAULT_MIN_F0 = 80.0;
     static DEFAULT_MAX_F0 = 1000.0;
     static DEFAULT_THRESHOLD = 0.1; // Absolute threshold for dip picking
-    static DEFAULT_SAMPLE_RATE = 44100; // 44.1k Hz
+    static DEFAULT_SAMPLE_RATE = 16000;
 
     /**
      * Creates a new YinF0Detector instance
@@ -182,21 +182,10 @@ export class YinF0Detector {
             }
         }
 
-        // Fallback: global minimum
-        let minIndex = 0;
-        let minVal = cmndf[0];
-        for (let i = 1; i < cmndf.length; i++) {
-            if (cmndf[i] < minVal) {
-                minVal = cmndf[i];
-                minIndex = i;
-            }
-        }
-
-        if (minVal > 0.4) return 0;
-
-        const tau = minLag + minIndex;
-        return this.octaveCorrection(cmndf, tau, minLag, maxLag);
+        // No fallback - if nothing crosses threshold, return 0
+        return 0;
     }
+
 
 
     /**
@@ -309,18 +298,20 @@ export class YinF0Detector {
     static frequencyToNote(frequency) {
         if (frequency <= 0) return "";
 
-        const A4_FREQUENCY = 440.0;
+        // 1. Convert to MIDI note number (standard formula)
+        // 69 = A4 (440Hz)
+        const midi = 69 + 12 * (Math.log(frequency / 440) / Math.log(2));
+        const roundedMidi = Math.round(midi);
+
+        // 2. Extract Note and Octave from MIDI
         const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
-        // Calculate semitones from A4
-        const semitonesFromA4 = 12.0 * (Math.log(frequency / A4_FREQUENCY) / Math.log(2.0));
-
-        // A4 is the 9th note (index 9) in the 4th octave
-        let noteIndex = Math.round(semitonesFromA4) % 12;
+        // Handle potential negative MIDI values safely
+        let noteIndex = roundedMidi % 12;
         if (noteIndex < 0) noteIndex += 12;
 
-        // Calculate octave
-        const octave = 4 + Math.floor((Math.round(semitonesFromA4) + 9) / 12);
+        // MIDI 0 = C-1. MIDI 12 = C0. MIDI 60 = C4.
+        const octave = Math.floor(roundedMidi / 12) - 1;
 
         return noteNames[noteIndex] + octave;
     }

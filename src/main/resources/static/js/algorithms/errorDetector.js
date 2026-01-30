@@ -140,9 +140,9 @@ export class ErrorDetector {
 
             this.errorMarkers.push(errorInfo);
 
-            console.log(`Pitch error at ${currentTime.toFixed(2)}s (frame ${errorInfo.frameIndex}): ` +
-                `User=${userMean.toFixed(1)}Hz, Sample=${sampleMean.toFixed(1)}Hz, ` +
-                `Deviation=${errorInfo.deviationPercent}% (${errorInfo.type})`);
+            //console.log(`Pitch error at ${currentTime.toFixed(2)}s (frame ${errorInfo.frameIndex}): ` +
+            //    `User=${userMean.toFixed(1)}Hz, Sample=${sampleMean.toFixed(1)}Hz, ` +
+            //    `Deviation=${errorInfo.deviationPercent}% (${errorInfo.type})`);
 
             return errorInfo;
         }
