@@ -13,12 +13,43 @@ Users are expected to utilize legally obtained audio files for their practice se
 
 ## Vocal Pitch Monitor UI:
 ![ui](src/main/resources/static/assets/ui-active.png)
->Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
+Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
 
 ## Database Structure (PostgresSQL):
 ![database](src/main/resources/static/assets/database-schema.png)
-> manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
+Manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
 
+## Setup
+- **Java Development Kit (JDK) version:** Java 21
+- **Frameworks:** Spring boot 4.0.1
+- **Database:** PostgreSQL (Recommanded) / MySQL
+
+Before running the application, you must configure your database connection.
+
+1. Navigate to ```src/main/resources/application.properties```.
+2. Update the database credentials to match your local or cloud setup
+
+Note: The project includes drivers for both, so you can choose your preferred database.
+
+Datasource connection with PostgresSQL:
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/your_database_name
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=org.postgresql.Driver
+```
+Last, build and run the project on a IDE platform (VSCode / IntillJ IDEA).
+![run](src/main/resources/static/assets/run.png)
+If u see this message, the project is initiated on default port (http://localhost:8080).
+
+After creating the database tables, figure this line to ```update``` in the ```application.properties```:
+```
+spring.jpa.hibernate.ddl-auto=update
+```
 
 If you have issues related to this project, capture the error and create a new issue in this GitHub repository
 
+
+## Acknowledgement
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. Everyone are free to use, modify, and distribute this software, provided you include the original copyright and license notice.
