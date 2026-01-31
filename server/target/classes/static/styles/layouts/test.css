@@ -1,0 +1,161 @@
+@import url('../base/header.css');
+
+:root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --accent-color: #bb86fc;
+    --btn-bg: #333;
+    --btn-hover: #444;
+    --input-bg: #2d2d2d;
+    --success: #03dac6;
+    --danger: #cf6679;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden; /* Prevents scrollbars on the body itself */
+
+    /* KEY FIX: Use Grid instead of Flex to handle the Header properly */
+    display: grid;
+
+    grid-template-rows: max-content 1fr;
+    grid-template-columns: 450px 1fr;
+
+    /* Defines the layout areas explicitly */
+    grid-template-areas:
+        "header header"
+        "controls response";
+}
+
+/*
+   This targets your top navigation bar/header.
+   We force it to sit in the 'header' area (top row) and span full width.
+*/
+/* FIXED */
+/* FIXED */
+body > :first-child:not(.control-panel):not(.response-panel),
+header {
+grid-area: header;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+
+.control-panel {
+    grid-area: controls; /* Places in bottom-left */
+
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto; /* Scroll ONLY inside this panel */
+    height: 100%;     /* Fill the grid cell */
+    border-right: 1px solid #333; /* separator line */
+    background-color: var(--bg-color);
+
+    /* Reset these from previous versions */
+    max-width: none;
+    flex: none;
+}
+
+.response-panel {
+    grid-area: response;
+    background-color: var(--bg-color);
+    /* CHANGED: Removed padding here so the black background fills the corner */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+}
+
+/* Card Styling (kept same) */
+.card {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+label { font-size: 0.9em; color: #aaa; }
+
+input[type="text"], input[type="number"], input[type="file"] {
+    background-color: var(--input-bg);
+    border: 1px solid #444;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: opacity 0.2s;
+    color: white;
+}
+
+button:hover { opacity: 0.8; }
+.btn-get { background-color: #4a4a4a; }
+.btn-post { background-color: var(--success); color: black; }
+.btn-red { background-color: var(--danger); color: black; }
+.btn-action { background-color: var(--accent-color); color: black; }
+
+#responseOutput {
+    font-family: 'Courier New', monospace; /* Ensures letters align perfectly */
+    color: #fdfdfd;
+
+    /* SCROLLING */
+    overflow-y: auto;  /* Vertical scroll */
+    overflow-x: auto;  /* Horizontal scroll (for long lines) */
+
+    /* SIZE & SHAPE */
+    flex: 1;
+    height: 100%;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-bg);
+    box-sizing: border-box;
+
+    /* --- THE FIX --- */
+    white-space: pre;  /* This tells the browser: "Respect my newlines and spaces!" */
+}
+
+#responseOutput {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 16px;
+    line-height: 1.4;
+    padding: 16px;
+}
+
+
