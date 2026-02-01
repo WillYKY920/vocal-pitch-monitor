@@ -1,7 +1,7 @@
 :root {
     --bg-dark: #0c0c0c;
     --card-bg: #1e1e1e;
-    --accent-purple: #7C4DFF;
+    --accent-purple: #633cce;
     --accent-purple-dim: #5e35b1;
     --text-main: #FFFFFF;
     --text-muted: #B0B0B0;
@@ -15,12 +15,14 @@
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+} /* <--- ADD THIS BRACE */
 
 body {
     background-color: var(--bg-dark);
     color: var(--text-main);
     height: 100vh;
+    width: 100%; /* Add this to ensure body fits */
+    overflow: hidden; /* Prevent body scroll, let panels scroll */
     display: flex;
     flex-direction: column;
 }

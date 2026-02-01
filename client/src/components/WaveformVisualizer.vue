@@ -8,15 +8,15 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useAudioRecorder } from '../composables/useAudioRecorder.js'
 
 const canvasRef = ref(null)
 const ctx = ref(null)
-const analyser = ref(null)
-const scriptProcessor = ref(null)
 const isRecording = ref(false)
 const amplitudeHistory = ref([])
 const maxHistory = 400
-const isPaused = ref(false)
+const audioRecorder = useAudioRecorder()
+const listenerHandle = ref(null)
 
 const resizeCanvas = () => {
   const parent = canvasRef.value?.parentElement
@@ -26,42 +26,37 @@ const resizeCanvas = () => {
   }
 }
 
-const start = (audioContext, sourceNode) => {
+const processAudio = (inputData) => {
+  if (!isRecording.value) return
+
+  let sum = 0
+  for (let i = 0; i < inputData.length; i++) {
+    sum += inputData[i] * inputData[i]
+  }
+
+  const rms = Math.sqrt(sum / inputData.length)
+  const displayValue = Math.min(rms * 10, 1.0)
+
+  amplitudeHistory.value.push({
+    timestamp: Date.now(),
+    value: rms,
+    display: displayValue
+  })
+
+  if (amplitudeHistory.value.length > maxHistory) {
+    amplitudeHistory.value.shift()
+  }
+  drawGraph()
+}
+
+const start = async (audioContext, sourceNode) => {
   if (isRecording.value) return
   if (!audioContext || !sourceNode) return
+
   try {
-    analyser.value = audioContext.createAnalyser()
-    analyser.value.fftSize = 2048
-    const bufferSize = 2048
-    scriptProcessor.value = audioContext.createScriptProcessor(bufferSize, 1, 1)
-
-    sourceNode.connect(analyser.value)
-    analyser.value.connect(scriptProcessor.value)
-
-    const gainNode = audioContext.createGain()
-    gainNode.gain.value = 0
-    scriptProcessor.value.connect(gainNode)
-    gainNode.connect(audioContext.destination)
-
-    scriptProcessor.value.onaudioprocess = (event) => {
-      if (!isRecording.value || isPaused.value) return
-      const inputData = event.inputBuffer.getChannelData(0)
-      let sum = 0
-      for (let i = 0; i < inputData.length; i++) {
-        sum += inputData[i] * inputData[i]
-      }
-
-      const rms = Math.sqrt(sum / inputData.length)
-      const displayValue = Math.min(rms * 10, 1.0)
-      amplitudeHistory.value.push({
-        timestamp: Date.now(),
-        value: rms,
-        display: displayValue
-      })
-      if (amplitudeHistory.value.length > maxHistory) {
-        amplitudeHistory.value.shift()
-      }
-      drawGraph()
+    listenerHandle.value = await audioRecorder.start(audioContext, sourceNode)
+    if (listenerHandle.value) {
+      listenerHandle.value.addListener(processAudio)
     }
     isRecording.value = true
   } catch (err) {
@@ -71,13 +66,9 @@ const start = (audioContext, sourceNode) => {
 
 const stop = () => {
   isRecording.value = false
-  if (scriptProcessor.value) {
-    scriptProcessor.value.disconnect()
-    scriptProcessor.value = null
-  }
-  if (analyser.value) {
-    analyser.value.disconnect()
-    analyser.value = null
+  if (listenerHandle.value) {
+    listenerHandle.value.removeListener()
+    listenerHandle.value = null
   }
 }
 

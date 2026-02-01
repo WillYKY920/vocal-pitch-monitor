@@ -1,41 +1,3 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import { API } from '../services/api.js'
-import { formatTime } from '../services/utils.js'
-
-const props = defineProps({
-  currentArtist: String,
-  currentSong: Object
-})
-
-const emit = defineEmits(['song-selected'])
-
-const artists = ref([])
-const songs = ref([])
-const selectedArtist = ref(null)
-
-const loadArtists = async () => {
-  const data = await API.getArtists()
-  artists.value = data.artists || []
-}
-
-const selectArtist = async (artistName) => {
-  selectedArtist.value = artistName
-  const data = await API.getSongsByArtist(artistName)
-  songs.value = data.songs || []
-}
-
-const selectSong = (song) => {
-  if (song && selectedArtist.value) {
-    emit('song-selected', { song, artistName: selectedArtist.value })
-  }
-}
-
-onMounted(() => {
-  loadArtists()
-})
-</script>
-
 <template>
   <div class="selection-area">
     <div class="list-headers">
@@ -76,3 +38,41 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { API } from '../services/api.js'
+import { formatTime } from '../services/utils.js'
+
+const props = defineProps({
+  currentArtist: String,
+  currentSong: Object
+})
+
+const emit = defineEmits(['song-selected'])
+
+const artists = ref([])
+const songs = ref([])
+const selectedArtist = ref(null)
+
+const loadArtists = async () => {
+  const data = await API.getArtists()
+  artists.value = data.artists || []
+}
+
+const selectArtist = async (artistName) => {
+  selectedArtist.value = artistName
+  const data = await API.getSongsByArtist(artistName)
+  songs.value = data.songs || []
+}
+
+const selectSong = (song) => {
+  if (song && selectedArtist.value) {
+    emit('song-selected', { song, artistName: selectedArtist.value })
+  }
+}
+
+onMounted(() => {
+  loadArtists()
+})
+</script>
