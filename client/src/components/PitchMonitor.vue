@@ -10,6 +10,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { YinF0Detector } from '../algorithms/pitchDetector.js'
 import { AudioFilter } from '../algorithms/audioFilter.js'
 import { ErrorDetector } from '../algorithms/errorDetector.js'
+import { useAudioRecorder } from '../composables/useAudioRecorder.js'
 
 const props = defineProps({
   audioElement: Object,
@@ -30,9 +31,8 @@ const VISIBLE_RANGE_SEMITONES = 32
 const MAX_HISTORY = 500
 const MAX_ERROR_MARKERS = 50
 
-const audioContext = ref(null)
-const scriptProcessor = ref(null)
-const sourceNode = ref(null)
+const audioRecorder = useAudioRecorder()
+const listenerHandle = ref(null)
 const isRunning = ref(false)
 const yinDetector = ref(null)
 const historyData = ref([])
@@ -57,9 +57,9 @@ const resizeCanvas = () => {
   if (!isRunning.value) draw()
 }
 
-const processAudio = (e) => {
+const processAudio = (inputData) => {
   if (!isRunning.value) return
-  const inputData = e.inputBuffer.getChannelData(0)
+
   let frequency = 0
   if (yinDetector.value) {
     frequency = yinDetector.value.estimateF0(inputData)
@@ -109,18 +109,13 @@ const processAudio = (e) => {
 const start = async (audioCtx, source) => {
   if (isRunning.value) return
   try {
-    audioContext.value = audioCtx
-    sourceNode.value = source
+    yinDetector.value = new YinF0Detector(audioCtx.sampleRate, 80, 1000, 0.15)
 
-    const node = audioCtx.createScriptProcessor(1024, 1, 1)
-    const yin = new YinF0Detector(audioCtx.sampleRate, 80, 1000, 0.15)
+    listenerHandle.value = await audioRecorder.start(audioCtx, source)
+    if (listenerHandle.value) {
+      listenerHandle.value.addListener(processAudio)
+    }
 
-    scriptProcessor.value = node
-    yinDetector.value = yin
-    node.onaudioprocess = processAudio
-
-    source.connect(node)
-    node.connect(audioCtx.destination)
     isRunning.value = true
     lastDrawTime.value = performance.now()
     updatePitch()
@@ -137,14 +132,9 @@ const stop = () => {
     animationFrameId.value = null
   }
 
-  if (scriptProcessor.value) {
-    scriptProcessor.value.onaudioprocess = null
-    scriptProcessor.value.disconnect()
-    scriptProcessor.value = null
-  }
-
-  if (sourceNode.value) {
-    sourceNode.value = null
+  if (listenerHandle.value) {
+    listenerHandle.value.removeListener()
+    listenerHandle.value = null
   }
 }
 

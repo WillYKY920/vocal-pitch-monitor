@@ -3,7 +3,7 @@ This project is dedicated for developing a web-based platform for real-time voca
 
 > Note that this project is incomplete. more modules to be added
 
-## Usage Declaration:
+## Usage Declaration
 This application is developed strictly for educational and training purposes. Its primary goal is to
 assist musicians and enthusiasts in practicing their vocal pitch skills through objective feedback and
 analysis.
@@ -11,11 +11,11 @@ analysis.
 This application does not advocate, endorse, or facilitate the piracy of copyrighted songs.
 Users are expected to utilize legally obtained audio files for their practice sessions.
 
-## Vocal Pitch Monitor UI:
+## Vocal Pitch Monitor UI
 ![ui](img/ui-active.png)
 Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
 
-## Database Structure (PostgresSQL):
+## Database Structure (PostgresSQL)
 ![database](img/database-schema.png)
 Manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
 
@@ -43,7 +43,7 @@ Last, build and run the project on a IDE platform (VSCode / IntillJ IDEA).
 
 If u see this message, the project is initiated on default port (http://localhost:8080).
 
-After creating the database tables, figure this line to ```update``` in the ```application.properties```:
+After creating the database tables, configure this line to ```update``` in the ```application.properties```:
 ```
 spring.jpa.hibernate.ddl-auto=update
 ```
@@ -53,4 +53,4 @@ If you have issues related to this project, capture the error and create a new i
 
 ## Acknowledgement
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. Everyone are free to use, modify, and distribute this software, provided you include the original copyright and license notice.
+This project is licensed under the MIT License. You are free to use, modify, and distribute this software. - see the [LICENSE](LICENSE) file for details.

@@ -8,8 +8,6 @@
     overflow: hidden;
 }
 
-
-/* --- Main Layout Grid --- */
 main {
     flex: 1;
     padding: 12px 80px;
@@ -33,6 +31,7 @@ main {
     position: relative; /* Context for absolute children */
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
+
 .graph-placeholder {
     color: var(--text-muted);
     font-size: 0.9rem;
