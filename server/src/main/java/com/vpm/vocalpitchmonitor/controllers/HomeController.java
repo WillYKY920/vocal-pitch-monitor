@@ -12,9 +12,9 @@ public class HomeController {
      * Home page of the web application. Endpoint: GET /vpm
      * @return the home.html page
      */
-    @GetMapping("/vpm")
+    @GetMapping("")
     public String homePage() {
-        return "redirect:pages/home.html";
+        return "redirect:index.html";
     }
 
     /**

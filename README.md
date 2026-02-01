@@ -12,17 +12,17 @@ This application does not advocate, endorse, or facilitate the piracy of copyrig
 Users are expected to utilize legally obtained audio files for their practice sessions.
 
 ## Vocal Pitch Monitor UI:
-![ui](src/main/resources/static/assets/ui-active.png)
+![ui](img/ui-active.png)
 Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
 
 ## Database Structure (PostgresSQL):
-![database](src/main/resources/static/assets/database-schema.png)
+![database](img/database-schema.png)
 Manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
 
 ## Setup
 - **Java Development Kit (JDK) version:** Java 21
-- **Frameworks:** Spring boot 4.0.1
-- **Database:** PostgreSQL (Recommanded) / MySQL
+- **Frameworks:** Spring boot v4.0.1 & Vue.js v3.5.24
+- **Database:** PostgreSQL (Recommended) / MySQL
 
 Before running the application, you must configure your database connection.
 
@@ -39,7 +39,8 @@ spring.datasource.password=your_password
 spring.datasource.driver-class-name=org.postgresql.Driver
 ```
 Last, build and run the project on a IDE platform (VSCode / IntillJ IDEA).
-![run](src/main/resources/static/assets/run.png)
+![run](img/run.png)
+
 If u see this message, the project is initiated on default port (http://localhost:8080).
 
 After creating the database tables, figure this line to ```update``` in the ```application.properties```:
