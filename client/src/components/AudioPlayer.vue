@@ -139,7 +139,6 @@
   await audio.value.play()
   isPlaying.value = true
 
-  // Re-initialize mic (getUserMeda) since we stopped it on pause
   const audioSetup = await initAudioContext()
   if (audioSetup) {
   emit('audio-context-ready', audioSetup)

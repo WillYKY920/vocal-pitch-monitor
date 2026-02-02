@@ -335,8 +335,6 @@ const extractPitchData = async (file) => {
   };
 };
 
-// --- Recording Logic ---
-
 const toggleRecording = async () => {
   if (isRecording.value) {
     stopRecording();

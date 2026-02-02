@@ -31,13 +31,13 @@
 }
 
 .control-panel {
-    grid-area: controls; /* Places in bottom-left */
+    grid-area: controls;
     padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    overflow-y: auto; /* Scroll ONLY inside this panel */
-    height: 100%;     /* Fill the grid cell */
+    overflow-y: auto;
+    height: 100%;
     background-color: var(--bg-dark);
 
 }
