@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8080"
+const BASE_URL = "http://localhost:8080/api"
 
 export const API = {
     async getArtists() {

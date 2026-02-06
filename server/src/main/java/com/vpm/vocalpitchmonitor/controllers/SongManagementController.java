@@ -19,6 +19,7 @@ import java.util.Map;
 
 @Validated
 @RestController
+@RequestMapping("/api")
 public class SongManagementController {
 
     private final SongManagementService songManagementService;
