@@ -1,0 +1,10 @@
+Demucs model: htdemucs_ft (fine-tuned)
+
+Sample format: float32
+Cilp mode: rescale
+File format: wav
+Encoder: libsndfile
+
+Shifts: >=2
+Overlap: 0.5
+Segment: 7.8s

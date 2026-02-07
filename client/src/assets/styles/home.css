@@ -44,6 +44,23 @@ main {
     display: block;
 }
 
+#playhead-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 80%;
+    width: 2px;
+    background-color: #888; /* Grey by default */
+    z-index: 10;
+    pointer-events: none;
+    transition: background-color 0.2s ease;
+}
+
+#playhead-line.recording {
+    background-color: #FF0000;
+}
+
+
 .bottom-section {
     display: grid;
     grid-template-columns: 1fr 1fr;

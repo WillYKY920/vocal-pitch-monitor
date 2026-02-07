@@ -17,11 +17,9 @@ import java.io.IOException;
 public class FileMapper {
 
     private final SongRepository songRepository;
-    private final AudiotrackRepository audiotrackRepository;
 
-    public FileMapper(SongRepository songRepository, AudiotrackRepository audiotrackRepository) {
+    public FileMapper(SongRepository songRepository) {
         this.songRepository = songRepository;
-        this.audiotrackRepository = audiotrackRepository;
     }
 
     public Vocaltrack toVocalTrack(VocalTrackDto vocalTrackDto, int songId) throws EntityNotFoundException {

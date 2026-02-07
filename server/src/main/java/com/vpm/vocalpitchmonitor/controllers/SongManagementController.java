@@ -166,7 +166,6 @@ public class SongManagementController {
      * @return a list of SongResponseDto objects representing all songs
      */
     @GetMapping("/song/all")
-    @ResponseStatus(HttpStatus.OK)
     public List<SongResponseDto> findAllSongs(){
         return songManagementService.findAllSongs();
     }

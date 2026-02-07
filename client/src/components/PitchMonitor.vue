@@ -1,16 +1,17 @@
 <template>
   <div id="monitor-container">
     <div id="note-display">{{ currentNote }}</div>
+    <div id="playhead-line" :class="{ recording: isRunning }"></div>
     <canvas ref="canvasRef" id="pitchCanvas"></canvas>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { YinF0Detector } from '../algorithms/pitchDetector.js'
 import { AudioFilter } from '../algorithms/audioFilter.js'
 import { ErrorDetector } from '../algorithms/errorDetector.js'
 import { useAudioRecorder } from '../composables/useAudioRecorder.js'
+import { mapPitchesToNotes } from '../services/utils.js'
 
 const props = defineProps({
   audioElement: Object,
@@ -28,7 +29,7 @@ const MIN_FREQ = 80
 const MAX_FREQ = 1000
 const GRAPH_SPEED = 4
 const VISIBLE_RANGE_SEMITONES = 32
-const MAX_HISTORY = 500
+const MAX_HISTORY = 1000
 const MAX_ERROR_MARKERS = 50
 
 const audioRecorder = useAudioRecorder()
@@ -53,12 +54,14 @@ const resizeCanvas = () => {
     canvasRef.value.width = parent.clientWidth
     canvasRef.value.height = parent.clientHeight
   }
-  maxHistoryLen.value = Math.min(Math.ceil(canvasRef.value.width / GRAPH_SPEED) + 1, MAX_HISTORY)
+  maxHistoryLen.value = MAX_HISTORY
   if (!isRunning.value) draw()
 }
 
 const processAudio = (inputData) => {
   if (!isRunning.value) return
+
+  const currentTime = props.audioElement ? props.audioElement.currentTime : (Date.now() / 1000)
 
   let frequency = 0
   if (yinDetector.value) {
@@ -75,13 +78,12 @@ const processAudio = (inputData) => {
     const smoothedFreq = 440 * Math.pow(2, (smoothedPitch - 69) / 12)
     currentNote.value = YinF0Detector.frequencyToNote(smoothedFreq)
     targetCenterPitch.value = smoothedPitch
-    historyData.value.push({ val: smoothedPitch, active: true })
+    historyData.value.push({ val: smoothedPitch, time: currentTime, active: true })
 
-    const currentTime = props.audioElement ? props.audioElement.currentTime : 0
     const error = errorDetector.value.processUserPitch(smoothedPitch, currentTime)
     if (error) {
       errorMarkers.value.push({
-        historyIndex: historyData.value.length - 1,
+        time: currentTime,
         errorInfo: error
       })
       if (errorMarkers.value.length > MAX_ERROR_MARKERS) {
@@ -89,18 +91,16 @@ const processAudio = (inputData) => {
       }
     }
   } else {
-    historyData.value.push({ val: null, active: false })
+    historyData.value.push({ val: null, time: currentTime, active: false })
   }
 
   if (historyData.value.length > maxHistoryLen.value) {
-    const removeCount = historyData.value.length - maxHistoryLen.value
-    historyData.value.splice(0, removeCount)
-    errorMarkers.value = errorMarkers.value
-        .map(marker => ({
-          ...marker,
-          historyIndex: marker.historyIndex - removeCount
-        }))
-        .filter(marker => marker.historyIndex >= 0)
+    historyData.value.shift()
+  }
+
+  const retentionTime = 10
+  if (historyData.value.length > 0 && (currentTime - historyData.value[0].time > retentionTime)) {
+    historyData.value.shift()
   }
 
   errorDetector.value.clearOldErrors(10000)
@@ -109,7 +109,7 @@ const processAudio = (inputData) => {
 const start = async (audioCtx, source) => {
   if (isRunning.value) return
   try {
-    yinDetector.value = new YinF0Detector(audioCtx.sampleRate, 80, 1000, 0.15)
+    yinDetector.value = new YinF0Detector(audioCtx.sampleRate, 80, 1000, 0.2)
 
     listenerHandle.value = await audioRecorder.start(audioCtx, source)
     if (listenerHandle.value) {
@@ -150,24 +150,24 @@ const updatePitch = () => {
   animationFrameId.value = requestAnimationFrame(updatePitch)
 }
 
-const timeToFrameIndex = (currentTime) => {
-  return Math.floor((currentTime * sampleRate.value) / hopSize.value)
-}
-
 const draw = () => {
   if (!ctx.value || !canvasRef.value) return
 
   const { width, height } = canvasRef.value
   ctx.value.clearRect(0, 0, width, height)
+
   ctx.value.fillStyle = '#111111'
   ctx.value.fillRect(0, 0, width, height)
+
+  const PLAYHEAD_X = width * 0.8
+  const PX_PER_SEC = (sampleRate.value / hopSize.value) * GRAPH_SPEED
+  const currentTime = props.audioElement ? props.audioElement.currentTime : (historyData.value.length > 0 ? historyData.value[historyData.value.length - 1].time : 0)
 
   currentCenterPitch.value += (targetCenterPitch.value - currentCenterPitch.value) * 0.05
   const halfRange = VISIBLE_RANGE_SEMITONES / 2
   const minMidi = currentCenterPitch.value - halfRange
   const maxMidi = currentCenterPitch.value + halfRange
   const range = maxMidi - minMidi
-
   const getY = (midiVal) => height - ((midiVal - minMidi) / range) * height
 
   ctx.value.font = "14px sans-serif"
@@ -195,10 +195,18 @@ const draw = () => {
     }
   }
 
-  if (referencePitchData.value && props.audioElement) {
-    const currentTime = props.audioElement.currentTime
-    const currentFrameIndex = timeToFrameIndex(currentTime)
-    const framesToShow = Math.min(maxHistoryLen.value, 300)
+  if (referencePitchData.value) {
+    const frameDuration = hopSize.value / sampleRate.value
+    const totalFrames = referencePitchData.value.length
+
+    const maxVisibleOffset = (width - PLAYHEAD_X)
+    const minVisibleOffset = -PLAYHEAD_X
+
+    const startFrame = Math.floor((currentTime + (minVisibleOffset / PX_PER_SEC)) / frameDuration)
+    const endFrame = Math.ceil((currentTime + (maxVisibleOffset / PX_PER_SEC)) / frameDuration)
+
+    const clampStart = Math.max(0, startFrame)
+    const clampEnd = Math.min(totalFrames - 1, endFrame)
 
     ctx.value.beginPath()
     ctx.value.lineWidth = 3
@@ -207,18 +215,15 @@ const draw = () => {
     ctx.value.lineJoin = "round"
     let pathStarted = false
 
-    for (let i = 0; i < framesToShow; i++) {
-      const refFrameIndex = currentFrameIndex - i
-      if (refFrameIndex < 0 || refFrameIndex >= referencePitchData.value.length) {
-        pathStarted = false
-        continue
-      }
+    for (let i = clampStart; i <= clampEnd; i++) {
+      const pitch = referencePitchData.value[i]
+      const frameTime = i * frameDuration
 
-      const pitch = referencePitchData.value[refFrameIndex]
       if (pitch !== null && pitch > 0) {
-        const x = width - (i * GRAPH_SPEED)
+        const x = PLAYHEAD_X + (frameTime - currentTime) * PX_PER_SEC
         const y = getY(pitch)
-        if (y >= -50 && y <= height + 50 && x >= -10 && x <= width + 10) {
+
+        if (y >= -50 && y <= height + 50) {
           if (!pathStarted) {
             ctx.value.moveTo(x, y)
             pathStarted = true
@@ -235,10 +240,11 @@ const draw = () => {
     ctx.value.stroke()
   }
 
-  const markersToRender = errorMarkers.value.slice(-30)
+  const markersToRender = errorMarkers.value
   markersToRender.forEach(marker => {
-    const historyPosition = historyData.value.length - 1 - marker.historyIndex
-    const x = width - (historyPosition * GRAPH_SPEED)
+    const timeDiff = marker.time - currentTime
+    const x = PLAYHEAD_X + (timeDiff * PX_PER_SEC)
+
     if (x >= 0 && x <= width) {
       ctx.value.beginPath()
       ctx.value.strokeStyle = "rgb(60,35,128)"
@@ -259,11 +265,14 @@ const draw = () => {
     ctx.value.shadowColor = "#FFFF00"
     let started = false
 
-    const historyLen = historyData.value.length
-    for (let i = 0; i < historyLen; i++) {
-      const point = historyData.value[historyLen - 1 - i]
-      const x = width - (i * GRAPH_SPEED)
-      if (x < -10) break
+    for (let i = 0; i < historyData.value.length; i++) {
+      const point = historyData.value[i]
+      const timeDiff = point.time - currentTime
+      const x = PLAYHEAD_X + (timeDiff * PX_PER_SEC)
+
+      if (x > PLAYHEAD_X) continue
+      if (x < -10) continue
+
       if (point.active && point.val !== null) {
         const y = getY(point.val)
         if (y < -50 || y > height + 50) {
@@ -310,16 +319,21 @@ const reset = () => {
 }
 
 watch(() => props.vocalData, (newData) => {
-  if (newData && errorDetector.value.loadSampleData(newData)) {
-    errorMarkers.value = []
-    referencePitchData.value = newData.pitchData.map(freq => {
-      if (freq > 0) {
-        return 69 + 12 * Math.log2(freq / 440)
-      }
-      return null
-    })
-    sampleRate.value = newData.sampleRate || 44100
-    hopSize.value = 512
+  if (newData) {
+    const mappedPitches = mapPitchesToNotes(newData.pitchData)
+    const processedData = { ...newData, pitchData: mappedPitches }
+
+    if (errorDetector.value.loadSampleData(processedData)) {
+      errorMarkers.value = []
+      referencePitchData.value = mappedPitches.map(freq => {
+        if (freq > 0) {
+          return 69 + 12 * Math.log2(freq / 440)
+        }
+        return null
+      })
+      sampleRate.value = newData.sampleRate || 44100
+      hopSize.value = 512
+    }
   }
 })
 

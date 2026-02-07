@@ -82,13 +82,11 @@
   return { context: audioContext.value, source: micStreamNode.value }
 }
 
-  // [NEW] Helper to stop microphone tracks and clear the red dot
   const stopMicrophone = () => {
   if (micMediaStream.value) {
   micMediaStream.value.getTracks().forEach(track => track.stop())
   micMediaStream.value = null
 }
-  // Clear the node so initAudioContext() creates a new one next time
   if (micStreamNode.value) {
   micStreamNode.value.disconnect()
   micStreamNode.value = null
