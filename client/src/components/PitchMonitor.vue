@@ -21,7 +21,6 @@ const props = defineProps({
 
 const canvasRef = ref(null)
 const currentNote = ref('')
-// Use shallowRef for objects/arrays to avoid deep reactivity overhead (performance fix)
 const ctx = shallowRef(null)
 const audioFilter = shallowRef(new AudioFilter(5, 24))
 const errorDetector = shallowRef(new ErrorDetector())
@@ -29,6 +28,7 @@ const errorMarkers = shallowRef([])
 
 const MIN_FREQ = 80
 const MAX_FREQ = 1000
+const THRESHOLD = 0.2
 const GRAPH_SPEED = 4
 const VISIBLE_RANGE_SEMITONES = 32
 const MAX_HISTORY = 1000
@@ -38,7 +38,7 @@ const audioRecorder = useAudioRecorder()
 const listenerHandle = shallowRef(null)
 const isRunning = ref(false)
 const yinDetector = shallowRef(null)
-const historyData = shallowRef([]) // Optimization: shallowRef prevents Proxy wrapping on push
+const historyData = shallowRef([])
 const maxHistoryLen = ref(0)
 const currentCenterPitch = ref(60)
 const targetCenterPitch = ref(60)
@@ -49,8 +49,38 @@ const animationFrameId = ref(null)
 const lastDrawTime = ref(0)
 const DRAW_INTERVAL = 16
 
-// Temp variable to decouple audio processing from DOM updates
 let latestDetectedNote = ''
+
+// --- NEW CODE START ---
+
+// Function to clear data when seeking
+const handleSeek = () => {
+  // Clear the user's pitch history graph
+  historyData.value.length = 0
+
+  // Clear error markers (prevents errors from the previous section cluttering the view)
+  errorMarkers.value.length = 0
+
+  // Reset current detection state
+  latestDetectedNote = ''
+  currentNote.value = ''
+
+  // Reset algorithms so they don't try to smooth pitch across the time jump
+  audioFilter.value.reset()
+  errorDetector.value.reset()
+}
+
+// Watch the audioElement prop to attach/detach the event listener
+watch(() => props.audioElement, (newEl, oldEl) => {
+  if (oldEl) {
+    oldEl.removeEventListener('seeking', handleSeek)
+  }
+  if (newEl) {
+    newEl.addEventListener('seeking', handleSeek)
+  }
+}, { immediate: true })
+
+// --- NEW CODE END ---
 
 const resizeCanvas = () => {
   if (!canvasRef.value) return
@@ -81,7 +111,6 @@ const processAudio = (inputData) => {
 
   if (smoothedPitch !== null) {
     const smoothedFreq = 440 * Math.pow(2, (smoothedPitch - 69) / 12)
-    // Optimization: Store note in var, update ref in animation loop
     latestDetectedNote = YinF0Detector.frequencyToNote(smoothedFreq)
 
     targetCenterPitch.value = smoothedPitch
@@ -98,7 +127,6 @@ const processAudio = (inputData) => {
       }
     }
   } else {
-    // Reset note if silence
     if (historyData.value.length > 0 && historyData.value[historyData.value.length - 1].active) {
       latestDetectedNote = ''
     }
@@ -120,7 +148,7 @@ const processAudio = (inputData) => {
 const start = async (audioCtx, source) => {
   if (isRunning.value) return
   try {
-    yinDetector.value = new YinF0Detector(audioCtx.sampleRate, 80, 1000, 0.2)
+    yinDetector.value = new YinF0Detector(audioCtx.sampleRate, MIN_FREQ, MAX_FREQ, THRESHOLD)
 
     listenerHandle.value = await audioRecorder.start(audioCtx, source)
     if (listenerHandle.value) {
@@ -152,7 +180,6 @@ const stop = () => {
 const updatePitch = () => {
   if (!isRunning.value) return
 
-  // Sync DOM updates with Animation Frame (prevents layout thrashing in audio callback)
   if (currentNote.value !== latestDetectedNote) {
     currentNote.value = latestDetectedNote
   }
@@ -231,12 +258,10 @@ const draw = () => {
     ctx.value.lineJoin = "round"
     let pathStarted = false
 
-    // Loop through visible reference data
     for (let i = clampStart; i <= clampEnd; i++) {
       const pitch = referencePitchData.value[i]
       const frameTime = i * frameDuration
 
-      // Optimization: Only calculate x/y if pitch is valid
       if (pitch !== null && pitch > 0) {
         const x = PLAYHEAD_X + (frameTime - currentTime) * PX_PER_SEC
         const y = getY(pitch)
@@ -323,11 +348,10 @@ const draw = () => {
 
 const reset = () => {
   stop()
-  // Clearing shallowRef array content
   historyData.value.length = 0
   errorMarkers.value.length = 0
   currentNote.value = ''
-  latestDetectedNote = '' // Reset temp var
+  latestDetectedNote = ''
   currentCenterPitch.value = 60
   targetCenterPitch.value = 60
   audioFilter.value.reset()
@@ -378,6 +402,11 @@ onUnmounted(() => {
   historyData.value = []
   errorMarkers.value = []
   referencePitchData.value = null
+
+  // --- NEW CODE: Cleanup listener ---
+  if (props.audioElement) {
+    props.audioElement.removeEventListener('seeking', handleSeek)
+  }
 })
 
 defineExpose({
