@@ -5,8 +5,9 @@
     <canvas ref="canvasRef" id="pitchCanvas"></canvas>
   </div>
 </template>
+
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, shallowRef, onMounted, onUnmounted, watch } from 'vue'
 import { YinF0Detector } from '../algorithms/pitchDetector.js'
 import { AudioFilter } from '../algorithms/audioFilter.js'
 import { ErrorDetector } from '../algorithms/errorDetector.js'
@@ -20,10 +21,11 @@ const props = defineProps({
 
 const canvasRef = ref(null)
 const currentNote = ref('')
-const ctx = ref(null)
-const audioFilter = ref(new AudioFilter(5, 24))
-const errorDetector = ref(new ErrorDetector())
-const errorMarkers = ref([])
+// Use shallowRef for objects/arrays to avoid deep reactivity overhead (performance fix)
+const ctx = shallowRef(null)
+const audioFilter = shallowRef(new AudioFilter(5, 24))
+const errorDetector = shallowRef(new ErrorDetector())
+const errorMarkers = shallowRef([])
 
 const MIN_FREQ = 80
 const MAX_FREQ = 1000
@@ -33,19 +35,22 @@ const MAX_HISTORY = 1000
 const MAX_ERROR_MARKERS = 50
 
 const audioRecorder = useAudioRecorder()
-const listenerHandle = ref(null)
+const listenerHandle = shallowRef(null)
 const isRunning = ref(false)
-const yinDetector = ref(null)
-const historyData = ref([])
+const yinDetector = shallowRef(null)
+const historyData = shallowRef([]) // Optimization: shallowRef prevents Proxy wrapping on push
 const maxHistoryLen = ref(0)
 const currentCenterPitch = ref(60)
 const targetCenterPitch = ref(60)
-const referencePitchData = ref(null)
+const referencePitchData = shallowRef(null)
 const sampleRate = ref(44100)
 const hopSize = ref(512)
 const animationFrameId = ref(null)
 const lastDrawTime = ref(0)
 const DRAW_INTERVAL = 16
+
+// Temp variable to decouple audio processing from DOM updates
+let latestDetectedNote = ''
 
 const resizeCanvas = () => {
   if (!canvasRef.value) return
@@ -76,7 +81,9 @@ const processAudio = (inputData) => {
 
   if (smoothedPitch !== null) {
     const smoothedFreq = 440 * Math.pow(2, (smoothedPitch - 69) / 12)
-    currentNote.value = YinF0Detector.frequencyToNote(smoothedFreq)
+    // Optimization: Store note in var, update ref in animation loop
+    latestDetectedNote = YinF0Detector.frequencyToNote(smoothedFreq)
+
     targetCenterPitch.value = smoothedPitch
     historyData.value.push({ val: smoothedPitch, time: currentTime, active: true })
 
@@ -91,6 +98,10 @@ const processAudio = (inputData) => {
       }
     }
   } else {
+    // Reset note if silence
+    if (historyData.value.length > 0 && historyData.value[historyData.value.length - 1].active) {
+      latestDetectedNote = ''
+    }
     historyData.value.push({ val: null, time: currentTime, active: false })
   }
 
@@ -140,6 +151,11 @@ const stop = () => {
 
 const updatePitch = () => {
   if (!isRunning.value) return
+
+  // Sync DOM updates with Animation Frame (prevents layout thrashing in audio callback)
+  if (currentNote.value !== latestDetectedNote) {
+    currentNote.value = latestDetectedNote
+  }
 
   const now = performance.now()
   if (now - lastDrawTime.value >= DRAW_INTERVAL) {
@@ -215,10 +231,12 @@ const draw = () => {
     ctx.value.lineJoin = "round"
     let pathStarted = false
 
+    // Loop through visible reference data
     for (let i = clampStart; i <= clampEnd; i++) {
       const pitch = referencePitchData.value[i]
       const frameTime = i * frameDuration
 
+      // Optimization: Only calculate x/y if pitch is valid
       if (pitch !== null && pitch > 0) {
         const x = PLAYHEAD_X + (frameTime - currentTime) * PX_PER_SEC
         const y = getY(pitch)
@@ -305,9 +323,11 @@ const draw = () => {
 
 const reset = () => {
   stop()
-  historyData.value = []
-  errorMarkers.value = []
+  // Clearing shallowRef array content
+  historyData.value.length = 0
+  errorMarkers.value.length = 0
   currentNote.value = ''
+  latestDetectedNote = '' // Reset temp var
   currentCenterPitch.value = 60
   targetCenterPitch.value = 60
   audioFilter.value.reset()
@@ -324,7 +344,7 @@ watch(() => props.vocalData, (newData) => {
     const processedData = { ...newData, pitchData: mappedPitches }
 
     if (errorDetector.value.loadSampleData(processedData)) {
-      errorMarkers.value = []
+      errorMarkers.value.length = 0
       referencePitchData.value = mappedPitches.map(freq => {
         if (freq > 0) {
           return 69 + 12 * Math.log2(freq / 440)
