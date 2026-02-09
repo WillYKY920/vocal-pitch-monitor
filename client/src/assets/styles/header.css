@@ -78,7 +78,7 @@ nav a:hover {
     opacity: 1;
 }
 
-/* Hamburger Menu Button (Hidden on Desktop) */
+/* Menu Button (Hidden on Desktop) */
 .menu-toggle {
     display: none;
     flex-direction: column;
@@ -120,7 +120,7 @@ nav a:hover {
     .menu-toggle {
         display: flex;
         position: absolute;
-        right: 40px; /* Changed from 40px to match header padding */
+        right: 40px;
         top: 50%;
         transform: translateY(-50%);
     }

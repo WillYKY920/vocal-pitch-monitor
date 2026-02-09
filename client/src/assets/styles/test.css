@@ -46,7 +46,6 @@
 .response-panel {
     grid-area: response;
     background-color: var(--bg-dark);
-    /* CHANGED: Removed padding here so the black background fills the corner */
     display: flex;
     flex-direction: column;
     overflow: hidden;
