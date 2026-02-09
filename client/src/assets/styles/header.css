@@ -101,18 +101,21 @@ nav a:hover {
 /* Mobile Styles */
 @media only screen and (max-width: 600px) {
     header {
-        padding: 0 20px;
-        position: fixed;
+        padding: 0 15px;
         top: 0;
         left: 0;
         right: 0;
-        z-index: 100;
     }
 
-    /* Add padding to body to prevent content from hiding under header */
     body {
-        padding-top: var(--header-height);
+        padding-top: 0;
     }
+
+    .logo-area {
+        font-family: 'Consolas', sans-serif;
+        font-size: 1.1rem;
+    }
+
 
     .menu-toggle {
         display: flex;
@@ -134,7 +137,6 @@ nav a:hover {
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.3s ease;
-        border-bottom: 2px solid var(--accent-purple);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
 

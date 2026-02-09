@@ -9,7 +9,6 @@
         <span>Pitch Detection Monitor</span>
       </div>
 
-      <!-- Hamburger Menu Button (Mobile Only) -->
       <button class="menu-toggle" @click="toggleMenu" aria-label="Toggle menu">
         <span></span>
         <span></span>
