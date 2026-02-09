@@ -51,26 +51,15 @@ const DRAW_INTERVAL = 16
 
 let latestDetectedNote = ''
 
-// --- NEW CODE START ---
-
-// Function to clear data when seeking
 const handleSeek = () => {
-  // Clear the user's pitch history graph
   historyData.value.length = 0
-
-  // Clear error markers (prevents errors from the previous section cluttering the view)
   errorMarkers.value.length = 0
-
-  // Reset current detection state
   latestDetectedNote = ''
   currentNote.value = ''
-
-  // Reset algorithms so they don't try to smooth pitch across the time jump
   audioFilter.value.reset()
   errorDetector.value.reset()
 }
 
-// Watch the audioElement prop to attach/detach the event listener
 watch(() => props.audioElement, (newEl, oldEl) => {
   if (oldEl) {
     oldEl.removeEventListener('seeking', handleSeek)
@@ -79,8 +68,6 @@ watch(() => props.audioElement, (newEl, oldEl) => {
     newEl.addEventListener('seeking', handleSeek)
   }
 }, { immediate: true })
-
-// --- NEW CODE END ---
 
 const resizeCanvas = () => {
   if (!canvasRef.value) return
@@ -403,7 +390,6 @@ onUnmounted(() => {
   errorMarkers.value = []
   referencePitchData.value = null
 
-  // --- NEW CODE: Cleanup listener ---
   if (props.audioElement) {
     props.audioElement.removeEventListener('seeking', handleSeek)
   }
