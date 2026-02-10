@@ -18,7 +18,7 @@
       <!-- Navigation -->
       <nav :class="{ 'mobile-open': isMobileMenuOpen }">
         <router-link to="/" @click="closeMenu">HOME</router-link>
-        <router-link to="/test" @click="closeMenu">TEST</router-link>
+        <a href="/test">TEST</a>
         <router-link to="/help" @click="closeMenu">HELP</router-link>
         <router-link to="/about" @click="closeMenu">ABOUT US</router-link>
       </nav>
