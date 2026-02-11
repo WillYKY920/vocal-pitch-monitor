@@ -9,8 +9,9 @@ assist musicians and enthusiasts in practicing their vocal pitch skills through 
 analysis.
 
 This application does not advocate, endorse, or facilitate the piracy of copyrighted songs.
-Users are expected to utilize legally obtained audio files for their practice sessions.
-
+Users are expected to utilize obtained audio files ONLY for their practice sessions.
+## Web Application Architecture Diagram
+![diagram](/img/xml-diagram.png)
 ## Vocal Pitch Monitor UI
 ![ui](img/ui-active.png)
 Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
