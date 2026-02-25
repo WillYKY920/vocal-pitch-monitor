@@ -14,11 +14,11 @@ Users are expected to utilize obtained audio files ONLY for their practice sessi
 ![diagram](/img/xml-diagram.png)
 ## Vocal Pitch Monitor UI
 ![ui](img/ui-active.png)
-Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
+> Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
 
 ## Database Structure (PostgresSQL)
 ![database](img/database-schema.png)
-Manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
+> Manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
 
 ## Setup
 - **Java Development Kit (JDK) version:** Java 21
