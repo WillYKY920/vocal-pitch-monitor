@@ -4,13 +4,11 @@ echo ===================================================
 echo       Song Extractor - Environment Setup
 echo ===================================================
 
-REM 1. Check and install FFmpeg
 echo.
 echo [1/3] Checking for FFmpeg...
 where ffmpeg >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
     echo FFmpeg not found. Attempting to install via winget...
-    REM winget is built into Windows 10/11
     winget install --id Gyan.FFmpeg -e --source winget
     echo.
     echo [!] NOTE: You might need to close and reopen your terminal after setup
@@ -19,14 +17,12 @@ if %ERRORLEVEL% NEQ 0 (
     echo FFmpeg is already installed.
 )
 
-REM 2. Create Python 3.11 Virtual Environment
 echo.
 echo [2/3] Setting up Python 3.11 Virtual Environment .venv...
-REM Check if the Python Launcher for Windows has 3.11 available
 py -3.11 --version >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Python 3.11 is not installed or not registered.
-    echo Please install Python 3.11 from python.org and try again.
+    curl -o python_installer.exe https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
     pause
     exit /b 1
 )
@@ -39,21 +35,17 @@ if not exist .venv (
     echo Virtual environment .venv already exists. Skipping creation.
 )
 
-REM 3. Activate and install packages
 echo.
 echo [3/3] Activating venv and installing packages...
 call .venv\Scripts\activate.bat
 
 echo Upgrading pip...
 python -m pip install --upgrade pip
-REM Put pip cache inside the project (fast repeat installs)
 set "PIP_CACHE_DIR=%CD%\.pip-cache"
 if not exist "%PIP_CACHE_DIR%" mkdir "%PIP_CACHE_DIR%"
 
-REM Pick a faster PyPI mirror for general packages (non-torch)
 set "PYPI_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple"
 
-REM Install dependencies
 echo Found requirements.txt. Installing dependencies...
 
 pip install torch torchaudio torchvision --index-url https://download.pytorch.org/whl/cu121 --cache-dir "%PIP_CACHE_DIR%"
@@ -64,6 +56,13 @@ python -m pip install -r requirements.txt ^
 
 pip install https://github.com/facebookresearch/demucs/archive/refs/heads/main.zip --no-deps
 
+echo.
+echo [Cleanup] Purging pip cache...
+pip cache purge
+if exist "%PIP_CACHE_DIR%" (
+    rmdir /s /q "%PIP_CACHE_DIR%"
+    echo Local .pip-cache folder removed.
+)
 
 echo.
 echo ===================================================

@@ -1,9 +1,5 @@
---extra-index-url https://download.pytorch.org/whl/cu121
 yt-dlp>=2024.1.0
 lrclibapi>=0.3.1
-torch
-torchaudio
-torchvision
 soundfile
 einops
 julius>=0.2.3
@@ -12,4 +8,3 @@ openunmix
 tqdm
 dora-search
 numpy==1.26.4
-demucs @ https://github.com/facebookresearch/demucs/archive/refs/heads/main.zip

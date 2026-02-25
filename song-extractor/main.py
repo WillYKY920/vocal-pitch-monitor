@@ -27,13 +27,6 @@ OUTPUT_DIR = "extracted"
 def _safe_folder_name(raw: str) -> str:
     """
     Strip characters that are invalid in directory names across major OSes.
-
-    Args:
-        raw: The unsanitized candidate folder name.
-
-    Returns:
-        A cleaned string retaining only alphanumerics, spaces, dashes,
-        underscores, and dots.
     """
     illegal_chars = '<>:"/\\|?*'
     return "".join(c for c in raw if c not in illegal_chars).strip()
@@ -116,7 +109,7 @@ def main():
 
     shutil.rmtree(TEMP_DIR, ignore_errors=True)
 
-    print(f"✓ Done!  Output folder: ./{target_folder_path}/")
+    print(f"✓ Done!  Output folder: .\\{target_folder_path}\\")
     for entry in sorted(os.listdir(target_folder_path)):
         print(f"    {entry}")
 

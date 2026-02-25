@@ -1,7 +1,7 @@
 """
 Configuration:
 Model     : htdemucs_ft (hybrid-transformer, fine-tuned)
-Shifts    : 2 (random time-shift augmentation passes, >= 2)
+Shifts    : 1 (random time-shift augmentation passes, >= 2)
 Overlap   : 0.5 (50 % overlap between segments)
 Segment   : 7.8 s (audio chunk size fed to the model)
 Clip mode : rescale (scales output to [-1, 1] instead of hard-clipping)
@@ -14,7 +14,7 @@ import demucs.api
 import soundfile as sf
 
 _MODEL = "htdemucs_ft"
-_SHIFTS = 2
+_SHIFTS = 1
 _OVERLAP = 0.5
 _SEGMENT = 7.8
 _CLIP = "rescale"
