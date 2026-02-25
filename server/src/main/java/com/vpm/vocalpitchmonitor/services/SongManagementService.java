@@ -63,12 +63,11 @@ public class SongManagementService {
         return mapper.toSongResponseDto(song);
     }
 
-    public ArtistResponseDto findArtistByName(String name) throws EntityNotFoundException {
-        Artist artist = artistRepository.findByArtistName(name)
-                .orElseThrow(() -> new EntityNotFoundException("Artist not found with name: " + name));
-
-        return mapper.toArtistResponseDto(artist);
+    public ArtistResponseDto findArtistByName(String name) {
+        List<SongResponseDto> songDtos = songRepository.findSongSummariesByArtistName(name);
+        return new ArtistResponseDto(name, songDtos);
     }
+
 
     public LyricsResponseDto findLyricsBySongId(int songId) throws EntityNotFoundException {
         Song song = songRepository.findById(songId)
@@ -132,13 +131,10 @@ public class SongManagementService {
 
     }
 
-    public List<SongResponseDto> findAllSongs(){
-
-        return songRepository.findAll()
-                .stream()
-                .map(mapper::toSongResponseDto)
-                .collect(Collectors.toList());
+    public List<SongResponseDto> findAllSongs() {
+        return songRepository.findAllSongSummaries();
     }
+
 
     // cascaded deletion
     public void deleteSongBySongId(int id) {

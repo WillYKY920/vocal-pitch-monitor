@@ -32,7 +32,7 @@
 
 .control-panel {
     grid-area: controls;
-    padding: 12px;
+    padding: 5px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -113,10 +113,10 @@ button:hover { opacity: 0.8; }
     overflow-y: auto;
     overflow-x: auto;
     height: 100%;
-    margin: 12px;
+    margin: 5px;
     padding: 20px;
     border-radius: 12px;
-    background-color: #1e1e1e;
+    background-color: #1a1a1a;
     border: 1px solid #1e1e1e;
     box-sizing: border-box;
     white-space: pre-wrap;

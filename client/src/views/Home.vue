@@ -65,6 +65,7 @@ const handleSongLoading = () => {
         ref="pitchMonitor"
         :audioElement="audioElement"
         :vocalData="currentVocalData"
+        :lyrics="lyrics"
     />
   </section>
 

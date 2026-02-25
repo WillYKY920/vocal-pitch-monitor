@@ -410,6 +410,21 @@ main {
     z-index: 5;
 }
 
+.export-btn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    width: 210px;
+    height: 80px;
+    border-radius: 12px;
+    background: var(--accent-purple-dim);
+    color: var(--text-color);
+    box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
+}
+
+
 @media only screen and (max-width: 600px) {
     /* Enable vertical scroll on mobile */
     #app {
@@ -525,4 +540,5 @@ main {
     #monitor-container {
         border-width: 2px;
     }
+
 }
