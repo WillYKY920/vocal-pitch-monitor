@@ -95,7 +95,7 @@ const drawGraph = () => {
 
   if (amplitudeHistory.value.length === 0) return
 
-  const barColor = '#7C4DFFFF'
+  const barColor = '#633CCEFF'
   const barWidth = 3
   const gap = 2
   const slotWidth = barWidth + gap

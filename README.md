@@ -13,7 +13,7 @@ Users are expected to utilize obtained audio files ONLY for their practice sessi
 ## Web Application Architecture Diagram
 ![diagram](/img/diagram.png)
 ## Vocal Pitch Monitor UI
-![ui](img/ui-active.png)
+![ui](img/desktop-ui.png)
 > Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
 
 ## Database Structure (PostgresSQL)
