@@ -280,7 +280,7 @@ main {
     color: var(--text-color);
     font-size: 12px;
     padding: 6px 8px;
-    max-width: 165px;
+    max-width: 120px;
     cursor: pointer;
 }
 
@@ -467,11 +467,12 @@ main {
     box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
 }
 
-@media only screen and (max-width: 1400px) {
+@media only screen and (max-width: 1440px) {
     .mic-select-wrapper {
         display: none;
     }
 }
+
 @media only screen and (max-width: 600px) {
     /* Enable vertical scroll on mobile */
     #app {
@@ -489,6 +490,9 @@ main {
         min-height: 100vh;
     }
 
+    .mic-select-wrapper {
+        display: none;
+    }
     /* Pitch graph (row 1) */
     .pitch-graph-container {
         height: 560px;
