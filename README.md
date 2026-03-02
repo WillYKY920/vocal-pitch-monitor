@@ -11,14 +11,23 @@ analysis.
 This application does not advocate, endorse, or facilitate the piracy of copyrighted songs.
 Users are expected to utilize obtained audio files ONLY for their practice sessions.
 ## Web Application Architecture Diagram
-![diagram](/img/diagram.png)
-## Vocal Pitch Monitor UI
+* **Frontend Framework (Vue.js)** <img width="3104" height="1168" alt="fsdfsfs" src="https://github.com/user-attachments/assets/490d3913-37c1-4c3c-8317-a755ab4e481e" />
+  1. **Lyrics Display:** Shows song lyrics line-by-line for singing along.
+  2. **Song Selection:** Choose tracks from the database
+  3. **Audio Player:** Plays music with essential playback controls and mic selection
+  4. **Pitch Monitor:** Detects and displays live vocal pitch accuracy
+  5. **Waveform Visualizer:** Visualizes audio as a moving graphical waveform.
+
+* **Backend Framework (Spring Boot)** <img width="3128" height="788" alt="sbdia" src="https://github.com/user-attachments/assets/8ccde04b-9271-435b-bc77-6a3727fb5f1f" />
+  1. **Controller**: Handle HTTP requests and responses with validation
+  2. **Service**: Contains business logic implementation
+  3. **DAO**: Interfaces for database operations
+
+* **Database Schema (PostgreSQL)**  ![database](img/database-schema.png)
+1. Manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
+## Web Application UI
 ![ui](img/desktop-ui.png)
 > Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
-
-## Database Structure (PostgresSQL)
-![database](img/database-schema.png)
-> Manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
 
 ## Setup
 - **Java Development Kit (JDK) version:** Java 21
