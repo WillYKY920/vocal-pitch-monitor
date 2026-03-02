@@ -23,7 +23,7 @@ Users are expected to utilize obtained audio files ONLY for their practice sessi
   2. **Service**: Contains business logic implementation
   3. **DAO**: Interfaces for database operations
 
-* **Database Schema (PostgreSQL)**  ![database](img/database-schema.png)
+* **Database Schema (PostgreSQL)** <img width="3208" height="1968" alt="fsdfsd" src="https://github.com/user-attachments/assets/b493347c-0254-46f8-ba9e-74105110c7c1" />
 1. Manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
 ## Web Application UI
 ![ui](img/desktop-ui.png)
