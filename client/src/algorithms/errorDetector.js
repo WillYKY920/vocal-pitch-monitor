@@ -1,6 +1,12 @@
-// js/errorDetector.js
-
+/**
+ * A class responsible for analyzing a user's live pitch against a pre-loaded reference vocal track.
+ * It calculates moving averages of both the user's pitch and the reference pitch over a specific window size,
+ * and flags an error if the percentage deviation exceeds a defined threshold.
+ */
 export class ErrorDetector {
+    /**
+     * Initializes the error detector with default settings for window size and deviation thresholds.
+     */
     constructor() {
         this.WINDOW_SIZE = 50;
         this.DEVIATION_THRESHOLD = 0.30;
@@ -9,11 +15,16 @@ export class ErrorDetector {
         this.errorMarkers = [];
         this.isEnabled = false;
 
-        // ADD: Audio timing parameters
-        this.sampleRate = 44100; // Default, will be updated
-        this.hopSize = 512; // Must match extraction hopSize
+        this.sampleRate = 44100;
+        this.hopSize = 512;
     }
 
+    /**
+     * Loads reference vocal data (pitch array, sample rate) into the detector to be used as the target baseline.
+     *
+     * @param {Object} vocalData - An object containing `pitchData`, `samples`, `fileName`, and optionally `sampleRate`.
+     * @returns {boolean} True if data was successfully loaded; otherwise false.
+     */
     loadSampleData(vocalData) {
         if (!vocalData || !vocalData.pitchData) {
             console.warn("Invalid vocal data provided");
@@ -63,25 +74,24 @@ export class ErrorDetector {
     }
 
     /**
-     * MODIFIED: Now requires currentTime parameter for sync
-     * @param {Number} midiPitch - User's current pitch in MIDI notation
-     * @param {Number} currentTime - Current playback time in seconds
-     * @returns {Object|null} Error information if deviation detected
+     * Compares the user's current pitch to the reference pitch at the exact current playback time.
+     * Calculates the mean of recent pitches for both user and sample, and flags an error if the deviation is too high.
+     *
+     * @param {Number} midiPitch - The user's current detected pitch in MIDI note notation.
+     * @param {Number} currentTime - The current playback time of the audio element in seconds.
+     * @returns {Object|null} An object containing error details (deviation, frame index, type) if an error is detected, or null if within acceptable bounds.
      */
     processUserPitch(midiPitch, currentTime) {
         if (!this.isEnabled || !this.samplePitchData) {
             return null;
         }
 
-        // FIXED: Calculate current frame index from playback time
         const currentFrameIndex = Math.floor((currentTime * this.sampleRate) / this.hopSize);
 
-        // Check if we're within sample data bounds
         if (currentFrameIndex >= this.samplePitchData.length) {
             console.warn(`Frame index ${currentFrameIndex} exceeds sample data length ${this.samplePitchData.length}`);
             return null;
         }
-
         const userFreq = midiPitch ? this.midiToFrequency(midiPitch) : 0;
 
         this.userPitchBuffer.push({
@@ -90,17 +100,14 @@ export class ErrorDetector {
             timestamp: Date.now()
         });
 
-        // Keep buffer size manageable (last 100 frames)
         if (this.userPitchBuffer.length > 100) {
             this.userPitchBuffer.shift();
         }
 
-        // Need enough data for window
         if (this.userPitchBuffer.length < this.WINDOW_SIZE) {
             return null;
         }
 
-        // Calculate user mean from recent buffer
         const recentUserPitches = this.userPitchBuffer
             .slice(-this.WINDOW_SIZE)
             .map(item => item.freq);

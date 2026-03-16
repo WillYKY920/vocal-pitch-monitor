@@ -1,9 +1,14 @@
 /**
- * AudioFilter.js
- * Handles pitch smoothing and octave error correction.
+ * A utility class designed to smooth raw pitch data and correct common tracking artifacts,
+ * specifically octave jumps that frequently occur with the YIN pitch detection algorithm.
  */
-
 export class AudioFilter {
+    /**
+     * Initializes the audio filter with settings for median smoothing and jump limits.
+     *
+     * @param {number} [medianWindowSize=5] - The number of recent pitch values to use when calculating the median.
+     * @param {number} [maxJumpSemitones=24] - The maximum allowable jump in semitones before an anomaly is suspected or rejected.
+     */
     constructor(medianWindowSize = 5, maxJumpSemitones = 24) {
         this.recentPitches = []; // Store recent valid pitches for median filtering
         this.medianWindowSize = medianWindowSize;
@@ -25,8 +30,11 @@ export class AudioFilter {
     }
 
     /**
-     * Checks if a pitch jump is likely an octave error (common in YIN algorithm)
-     * and corrects it to the nearest likely true pitch based on history.
+     * Evaluates a sudden jump in pitch to determine if it is an artificial octave error (common in YIN).
+     * If the jump is exactly 1 or 2 octaves (12 or 24 semitones), it corrects the pitch back to the previous register.
+     *
+     * @param {number} midiFloat - The raw detected MIDI pitch value.
+     * @returns {number} The corrected MIDI pitch value.
      */
     correctOctaveJump(midiFloat) {
         if (this.lastValidPitch === null) return midiFloat;
@@ -47,24 +55,22 @@ export class AudioFilter {
     }
 
     /**
-     * Main processing method.
-     * Takes a raw MIDI value, applies octave correction and median smoothing.
-     * Returns the smoothed pitch if valid, or null if the jump is too large/invalid.
+     * Processes a raw MIDI pitch value by applying octave correction, adding it to a rolling buffer,
+     * and applying a median filter to remove transient spikes/outliers.
+     *
+     * @param {number} midiFloat - The raw detected MIDI pitch value.
+     * @returns {number|null} The smoothed MIDI pitch value, or null if the pitch jump was impossibly large (likely noise).
      */
     process(midiFloat) {
-        // 1. Correct potential octave errors
         const correctedPitch = this.correctOctaveJump(midiFloat);
 
-        // 2. Add to smoothing buffer
         this.recentPitches.push(correctedPitch);
         if (this.recentPitches.length > this.medianWindowSize) {
             this.recentPitches.shift();
         }
 
-        // 3. Apply median filter
         const smoothedPitch = this.getMedianPitch(this.recentPitches);
 
-        // 4. Relaxed validation: allow larger jumps or reset if gap is huge
         if (this.lastValidPitch === null) {
             this.lastValidPitch = smoothedPitch;
             return smoothedPitch;
@@ -83,8 +89,6 @@ export class AudioFilter {
             return null;
         }
 
-        // For jumps between 24-36 semitones, accept but don't update lastValidPitch
-        // This allows the visualization to continue without enforcing strict continuity
         return smoothedPitch;
     }
 

@@ -1,19 +1,28 @@
 <template>
   <div class="selection-area">
     <div class="list-headers">
-      <div class="header-cell">Artists</div>
+      <div class="header-cell artist-header">
+        <span>Artists</span>
+        <select v-model="selectedLang" class="lang-select">
+          <option value="all">all</option>
+          <option value="zh">zh</option>
+          <option value="ko">ko</option>
+          <option value="en">en</option>
+        </select>
+      </div>
       <div class="header-cell">Songs</div>
     </div>
     <div class="list-content">
       <div class="column artist-col">
+        <!-- Loop over filteredArtists and use artist.name -->
         <div
-            v-for="artist in artists"
-            :key="artist"
+            v-for="artist in filteredArtists"
+            :key="artist.name"
             class="column-item"
-            :class="{ active: selectedArtist === artist }"
-            @click="selectArtist(artist)"
+            :class="{ active: selectedArtist === artist.name }"
+            @click="selectArtist(artist.name)"
         >
-          {{ artist }}
+          {{ artist.name }}
         </div>
       </div>
       <div class="column song-col">
@@ -27,12 +36,12 @@
         <div
             v-for="song in songs"
             :key="song.id"
-            class="column-item"
+            class="column-item song-item"
             :class="{ active: currentSong?.id === song.id }"
             @click="selectSong(song)"
         >
-          {{ song.title }}
-          <span v-if="song.duration">({{ formatTime(song.duration, true) }})</span>
+          <span>{{ song.title }}</span>
+          <span v-if="song.duration">{{ formatTime(song.duration, true) }}</span>
         </div>
       </div>
     </div>
@@ -40,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue' // Imported computed
 import { API } from '../services/api.js'
 import { formatTime } from '../services/utils.js'
 
@@ -51,15 +60,22 @@ const props = defineProps({
 
 const emit = defineEmits(['song-selected'])
 
-const artists = ref([])
+const artists = ref([]) // Now holds array of objects: { name: 'XX', lang: 'XX' }
 const songs = ref([])
 const selectedArtist = ref(null)
+const selectedLang = ref('all') // Default to 'all'
+
+const filteredArtists = computed(() => {
+  if (selectedLang.value === 'all') return artists.value
+  return artists.value.filter(artist => artist.lang === selectedLang.value)
+})
 
 const loadArtists = async () => {
   const data = await API.getArtists()
   artists.value = data.artists || []
 }
 
+// Ensure this still expects the string name, which we pass from the template using artist.name
 const selectArtist = async (artistName) => {
   selectedArtist.value = artistName
   const data = await API.getSongsByArtist(artistName)

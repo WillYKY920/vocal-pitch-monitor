@@ -2,9 +2,7 @@ package com.vpm.vocalpitchmonitor.DTOs;
 
 import java.util.List;
 
-public record ArtistListResponseDto(
+public record ArtistListResponseDto(List<ArtistSummary> artists) {
 
-        List<String> artists
-) {
-
+    public record ArtistSummary(String name, String lang) {}
 }

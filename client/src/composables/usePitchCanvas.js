@@ -436,13 +436,11 @@ export function usePitchCanvas(props, canvasRef) {
     })
 
     return {
-        // template state
         canvasRef,
         currentNote,
         isRunning,
         showExport,
 
-        // actions
         start,
         stop,
         reset,

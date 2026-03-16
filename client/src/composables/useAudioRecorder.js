@@ -1,11 +1,13 @@
-import { ref, onUnmounted } from 'vue'
+import { ref } from 'vue'
+import workletUrl from '../services/recorderWorklet.js?url'
 
 const audioContext = ref(null)
-const scriptProcessor = ref(null)
+const workletNode = ref(null)
 const sourceNode = ref(null)
 const isActive = ref(false)
 const listeners = new Map()
 let listenerIdCounter = 0
+let initPromise = null
 
 export function useAudioRecorder() {
     const start = async (audioCtx, source) => {
@@ -13,31 +15,44 @@ export function useAudioRecorder() {
             return registerListener()
         }
 
-        try {
-            audioContext.value = audioCtx
-            sourceNode.value = source
-
-            const node = audioCtx.createScriptProcessor(1024, 1, 1)
-            scriptProcessor.value = node
-
-            node.onaudioprocess = (e) => {
-                if (!isActive.value) return
-                const inputData = e.inputBuffer.getChannelData(0)
-
-                listeners.forEach((callback) => {
-                    callback(inputData, e)
-                })
-            }
-
-            source.connect(node)
-            node.connect(audioCtx.destination)
-            isActive.value = true
-
+        if (initPromise) {
+            await initPromise
             return registerListener()
-        } catch (err) {
-            console.error('Error starting audio recorder:', err)
-            return null
         }
+
+        initPromise = (async () => {
+            try {
+                audioContext.value = audioCtx
+                sourceNode.value = source
+
+                await audioCtx.audioWorklet.addModule(workletUrl)
+
+                const node = new AudioWorkletNode(audioCtx, 'recorder-worklet')
+                workletNode.value = node
+
+                node.port.onmessage = (e) => {
+                    if (!isActive.value) return
+                    const inputData = e.data.audioData
+
+                    listeners.forEach((callback) => {
+                        callback(inputData, e)
+                    })
+                }
+
+                source.connect(node)
+                node.connect(audioCtx.destination)
+                isActive.value = true
+            } catch (err) {
+                console.error('Error starting audio recorder:', err)
+            }
+        })()
+
+        await initPromise
+        initPromise = null
+
+        if (!isActive.value) return null
+
+        return registerListener()
     }
 
     const registerListener = () => {
@@ -61,10 +76,10 @@ export function useAudioRecorder() {
         isActive.value = false
         listeners.clear()
 
-        if (scriptProcessor.value) {
-            scriptProcessor.value.onaudioprocess = null
-            scriptProcessor.value.disconnect()
-            scriptProcessor.value = null
+        if (workletNode.value) {
+            workletNode.value.port.onmessage = null
+            workletNode.value.disconnect()
+            workletNode.value = null
         }
 
         if (sourceNode.value) {

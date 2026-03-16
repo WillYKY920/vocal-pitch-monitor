@@ -15,7 +15,6 @@ export function formatTime(timeValue, isMs = false) {
 /**
  * Maps an array of raw pitch frequencies to the nearest musical note frequencies
  * within the range of E2 to C6 (Standard Equal Temperament, A4 = 440Hz).
- *
  * Zeros in the input array (representing silence or unvoiced segments) are preserved as 0.
  *
  * @param {number[]} pitchData - Array of pitch frequencies (Hz) to process.

@@ -16,6 +16,8 @@ import lombok.Setter;
  * | id             | INT           | PK, Auto Increment         |
  * | name           | VARCHAR       | Unique                     |
  * | samples        | BIGINT        |                            |
+ * | sample-rate    | BIGINT        |                            |
+ * | hop-size       | INT           |                            |
  * | pitch-data     | DOUBLE[]      | Not Null                   |
  * | song_id        | INT           | FK to song(id)             |
  * |----------------|---------------|----------------------------|

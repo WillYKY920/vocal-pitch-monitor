@@ -2,6 +2,7 @@ package com.vpm.vocalpitchmonitor.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import org.springframework.aot.generate.ClassNameGenerator;
 
 import java.util.List;
 
@@ -33,6 +34,9 @@ public class Artist {
     @Column(name = "name", unique = true) @JsonProperty("name")
     private String artistName;
 
+    // ISO 639 language codes
+    @Column(name = "lang") @JsonProperty("lang")
+    private String language;
     /**
      * The list of songs associated with this artist.
      * Mapped by the "artist" field in the Song entity.
@@ -46,6 +50,11 @@ public class Artist {
 
     public Artist(String artistName) {
         this.artistName = artistName;
+    }
+
+    public Artist(String artistName, String language) {
+        this.artistName = artistName;
+        this.language = language;
     }
 
     // Getters & Setters
@@ -71,5 +80,13 @@ public class Artist {
 
     public void setSongs(List<Song> songs) {
         this.songs = songs;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

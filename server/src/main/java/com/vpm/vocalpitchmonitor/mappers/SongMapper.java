@@ -1,9 +1,6 @@
 package com.vpm.vocalpitchmonitor.mappers;
 
-import com.vpm.vocalpitchmonitor.DTOs.ArtistResponseDto;
-import com.vpm.vocalpitchmonitor.DTOs.LyricsResponseDto;
-import com.vpm.vocalpitchmonitor.DTOs.SongDto;
-import com.vpm.vocalpitchmonitor.DTOs.SongResponseDto;
+import com.vpm.vocalpitchmonitor.DTOs.*;
 import com.vpm.vocalpitchmonitor.entities.Artist;
 import com.vpm.vocalpitchmonitor.entities.Song;
 import com.vpm.vocalpitchmonitor.entities.SyncedLyrics;
@@ -48,8 +45,15 @@ public class SongMapper {
         return new ArtistResponseDto(artist.getArtistName(), songResponseDtos);
     }
 
-    public String artistToString(Artist artist){
-        return artist.getArtistName();
+    public ArtistListResponseDto.ArtistSummary toArtistSummary(Artist artist) {
+        if (artist == null) {
+            return null;
+        }
+        return new ArtistListResponseDto.ArtistSummary(
+                artist.getArtistName(),
+                artist.getLanguage() // Replace with your actual getter name if different
+        );
     }
+
 
 }

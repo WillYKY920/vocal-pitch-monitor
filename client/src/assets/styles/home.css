@@ -1,3 +1,6 @@
+/* ==========================================================================
+   01. BASE & MAIN LAYOUT
+   ========================================================================== */
 #app {
     display: flex;
     flex-direction: column;
@@ -15,7 +18,25 @@ main {
     min-height: 0;
 }
 
-/* --- Pitch Graph --- */
+.bottom-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    min-height: 0;
+}
+
+.ui-frame {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* ==========================================================================
+   02. PITCH GRAPH COMPONENT
+   ========================================================================== */
 .pitch-graph-container {
     background-color: var(--card-bg);
     border-radius: var(--border-radius);
@@ -58,23 +79,9 @@ main {
     background-color: #FF0000;
 }
 
-
-.bottom-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    min-height: 0;
-}
-
-.ui-frame {
-    background-color: var(--card-bg);
-    border-radius: var(--border-radius);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-}
-
+/* ==========================================================================
+   03. SELECTION AREA (TRACK LIST)
+   ========================================================================== */
 .selection-area {
     flex: 1;
     display: flex;
@@ -119,6 +126,35 @@ main {
     border-right: 4px solid var(--divider-color);
 }
 
+.artist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lang-select {
+    border-radius: 6px;
+    border: 0;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-color);
+}
+
+.lang-select:hover {
+    background: var(--card-bg);
+}
+
+.lang-select option {
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+.song-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .column-item {
     padding: 12px 15px;
     border-bottom: 2px solid rgba(255,255,255,0.05);
@@ -141,7 +177,9 @@ main {
     border-left: 3px solid var(--accent-purple);
 }
 
-/* --- Player Controls --- */
+/* ==========================================================================
+   04. PLAYER CONTROLS
+   ========================================================================== */
 .player-area {
     height: 110px;
     background-color: #252525;
@@ -152,6 +190,68 @@ main {
     border-top: 2px solid rgba(255,255,255,0.1);
 }
 
+.controls-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    position: relative;
+    gap: 12px;
+    width: 100%;
+}
+
+.controls {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    pointer-events: auto;
+}
+
+.right-group {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
+}
+
+/* Track Info */
+.track-info {
+    flex: 1 2 0;
+    margin-top: -8px;
+}
+
+.track-info h4 {
+    font-size: 1.6rem;
+}
+
+.track-info span {
+    font-size: 1.0rem;
+    color: var(--text-muted);
+}
+
+/* Play Button */
+.play-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-bright));
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
+    transition: transform 0.1s;
+}
+
+.play-btn:active {
+    transform: scale(0.95);
+}
+
+/* Progress Bar */
 .progress-row {
     display: flex;
     align-items: center;
@@ -182,11 +282,10 @@ main {
     margin-bottom: 0;
 }
 
-
 .progress-fill {
     width: 0%;
     height: 100%;
-    background: linear-gradient(to right,var(--accent-purple-bright) ,var(--accent-purple));
+    background: linear-gradient(to right, var(--accent-purple-bright), var(--accent-purple));
     border-radius: 4px;
     position: relative;
     transition: width 0.1s linear;
@@ -206,73 +305,16 @@ main {
     z-index: 10;
 }
 
-.right-group {
-    margin-left: auto;        /* pushes the whole group to the far right */
-    display: flex;
-    align-items: center;
-    gap: 12px;                /* gap between mic-select and volume bar */
-    flex: 0 0 auto;
-}
-
-.controls-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: nowrap;
-    position: relative;
-    gap: 12px;
-    width: 100%;
-}
-
-.controls {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
-    pointer-events: auto;
-}
-
-.track-info {
-    flex: 1 2 0;
-    margin-top: -8px;
-}
-
-.track-info h4 {
-
-    font-size: 1.6rem;
-}
-.track-info span {
-    font-size: 1.0rem;
-    color: var(--text-muted);
-}
-
-
-.play-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(135deg ,var(--accent-purple), var(--accent-purple-bright));
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
-    transition: transform 0.1s;
-}
-
-.play-btn:active {
-    transform: scale(0.95);
-}
+/* Mic Selection */
 .mic-select-wrapper {
     flex: 0 0 auto;
     margin-left: auto;
     display: inline-flex;
-    align-items: center;      /* Vertically centers children */
+    align-items: center;
     justify-content: center;
     margin-right: 12px;
 }
+
 .mic-select {
     background: rgba(255, 255, 255, 0.08);
     border: 0;
@@ -285,8 +327,8 @@ main {
 }
 
 .mic-select:hover {
-    border-color: rgba(255, 255, 255, 0.35);
-    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--card-bg);
+    background: var(--card-bg);
 }
 
 .mic-select:disabled {
@@ -299,7 +341,7 @@ main {
     color: var(--text-color);
 }
 
-/* Volume Control*/
+/* Volume Control */
 .volume-control {
     flex: 0 0 auto;
     display: flex;
@@ -320,12 +362,14 @@ main {
 .volume-fill {
     width: 50%;
     height: 100%;
-    background: linear-gradient(to right,var(--accent-purple-bright) ,var(--accent-purple));
+    background: linear-gradient(to right, var(--accent-purple-bright), var(--accent-purple));
     border-radius: 2px;
     flex-shrink: 0;
 }
 
-/* --- RIGHT FRAME: Visualizer & Lyrics --- */
+/* ==========================================================================
+   05. VISUALIZER & LYRICS
+   ========================================================================== */
 .right-frame {
     display: flex;
     flex-direction: column;
@@ -343,7 +387,6 @@ main {
     padding: 20px;
     position: relative;
 }
-
 
 #waveformCanvas {
     position: relative;
@@ -366,6 +409,7 @@ main {
 
 .waveform-indicator-bar.recording {
     background-color: var(--accent-purple);
+    box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
 }
 
 @keyframes bounce {
@@ -373,7 +417,7 @@ main {
     50% { height: 100%; opacity: 1; }
 }
 
-/* Lyrics Area (Consolidated) */
+/* Lyrics */
 .lyrics-area {
     flex: 1;
     min-height: 0;
@@ -418,8 +462,10 @@ main {
 .lyric-line.empty {
     height: 1.2rem;
 }
-/* --- Vocal Pitch Monitor Styles --- */
 
+/* ==========================================================================
+   06. VOCAL PITCH MONITOR SPECIFICS
+   ========================================================================== */
 #monitor-container {
     position: relative;
     width: 100%;
@@ -431,7 +477,6 @@ main {
     border-radius: 12px;
 }
 
-/* Canvas for the scrolling graph */
 #monitor-container canvas {
     display: block;
     width: 100%;
@@ -439,7 +484,6 @@ main {
     border-radius: inherit;
 }
 
-/* The big note display */
 #note-display {
     position: absolute;
     top: 20px;
@@ -467,6 +511,9 @@ main {
     box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
 }
 
+/* ==========================================================================
+   07. MEDIA QUERIES
+   ========================================================================== */
 @media only screen and (max-width: 1440px) {
     .mic-select-wrapper {
         display: none;
@@ -474,15 +521,14 @@ main {
 }
 
 @media only screen and (max-width: 600px) {
-    /* Enable vertical scroll on mobile */
+    /* Main Layout Reflow */
     #app {
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Change main to 4-row vertical layout */
     main {
-        padding: 12px 12px;
+        padding: 12px;
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -490,16 +536,6 @@ main {
         min-height: 100vh;
     }
 
-    .mic-select-wrapper {
-        display: none;
-    }
-    /* Pitch graph (row 1) */
-    .pitch-graph-container {
-        height: 560px;
-        flex-shrink: 0;
-    }
-
-    /* Bottom section becomes rows 2-4 */
     .bottom-section {
         display: flex;
         flex-direction: column;
@@ -507,12 +543,20 @@ main {
         height: auto;
     }
 
-    /* Flatten left-frame so player and selection are direct children */
     .ui-frame.left-frame {
         display: contents;
     }
 
-    /* Right frame (row 2) - waveform + lyrics */
+    /* Component Adjustments */
+    .pitch-graph-container {
+        height: 560px;
+        flex-shrink: 0;
+    }
+
+    .mic-select-wrapper {
+        display: none;
+    }
+
     .ui-frame.right-frame {
         height: 180px;
         flex-shrink: 0;
@@ -529,9 +573,11 @@ main {
         bottom: 10px;
     }
 
+    /* Lyrics Adjustments */
     .lyrics-area {
         flex: 2;
     }
+
     .lyric-line.active {
         font-size: 1.5rem;
     }
@@ -539,11 +585,12 @@ main {
     .lyric-line.prev {
         display: none;
     }
+
     .lyric-line.next {
         font-size: 1rem;
     }
 
-
+    /* Player Adjustments */
     .player-area {
         order: 2;
         flex-shrink: 0;
@@ -554,11 +601,12 @@ main {
     .track-info h4 {
         font-size: 1.2rem;
     }
+
     .track-info span {
         font-size: 0.8rem;
-        color: var(--text-muted);
     }
 
+    /* Selection List Adjustments */
     .selection-area {
         order: 3;
         min-height: 200px;
@@ -578,11 +626,13 @@ main {
     .list-content {
         grid-template-columns: 0.6fr 1.2fr;
     }
+
     .column-item {
         padding: 10px 12px;
         font-size: 0.85rem;
     }
 
+    /* Vocal Pitch Monitor Specific Adjustments */
     #note-display {
         font-size: 32px;
         top: 10px;
@@ -591,5 +641,4 @@ main {
     #monitor-container {
         border-width: 2px;
     }
-
 }
