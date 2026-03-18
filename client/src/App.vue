@@ -5,8 +5,8 @@
   <div id="app">
     <header>
       <div class="logo-area">
-        <div class="logo-icon"></div>
-        <span>Pitch Detection Monitor</span>
+        <img src="./assets/images/icon.png" alt="Vocal Pitch Monitor Logo" class="logo-image" />
+        <span>Vocal Pitch Monitor</span>
       </div>
 
       <button class="menu-toggle" @click="toggleMenu" aria-label="Toggle menu">

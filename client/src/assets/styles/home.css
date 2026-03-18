@@ -52,7 +52,7 @@ main {
 }
 
 .graph-placeholder {
-    color: var(--text-muted);
+    color: var(--text-dim);
     font-size: 0.9rem;
     letter-spacing: 1px;
 }
@@ -95,7 +95,7 @@ main {
     background: linear-gradient(to right, var(--accent-purple), var(--accent-purple-bright));
     padding: 10px 0;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 1rem;
     flex-shrink: 0;
 }
 
@@ -138,13 +138,11 @@ main {
     cursor: pointer;
     background: transparent;
     color: var(--text-color);
-}
-
-.lang-select:hover {
-    background: var(--card-bg);
+    font-size: 1rem;
 }
 
 .lang-select option {
+    font-size: 1rem;
     background: var(--card-bg);
     color: var(--text-color);
 }
@@ -229,7 +227,7 @@ main {
 
 .track-info span {
     font-size: 1.0rem;
-    color: var(--text-muted);
+    color: var(--text-dim);
 }
 
 /* Play Button */
@@ -237,7 +235,7 @@ main {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-bright));
+    background: linear-gradient(45deg, var(--accent-purple), var(--accent-purple-bright));
     border: none;
     display: flex;
     align-items: center;
@@ -362,7 +360,7 @@ main {
 .volume-fill {
     width: 50%;
     height: 100%;
-    background: linear-gradient(to right, var(--accent-purple-bright), var(--accent-purple));
+    background: linear-gradient(to right, var(--accent-purple-bright), 70%, var(--accent-purple));
     border-radius: 2px;
     flex-shrink: 0;
 }
@@ -454,7 +452,7 @@ main {
 .lyric-line.prev,
 .lyric-line.next {
     font-size: 1.2rem;
-    color: var(--text-muted);
+    color: var(--text-dim);
     opacity: 0.4;
     filter: blur(0.5px);
 }
@@ -506,7 +504,7 @@ main {
     width: 210px;
     height: 80px;
     border-radius: 12px;
-    background: linear-gradient(to right, var(--accent-purple), var(--accent-purple-bright));
+    background: linear-gradient(45deg, var(--accent-purple), var(--accent-purple-bright));
     color: var(--text-color);
     box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
 }

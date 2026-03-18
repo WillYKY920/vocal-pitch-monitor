@@ -2,10 +2,11 @@
     --bg-dark: #0c0c0c;
     --card-bg: #1e1e1e;
     --accent-purple: #633cce;
-    --accent-purple-bright: #7e5eb9;
+    --accent-purple-bright: #9D5CFFFF;
     --accent-purple-dim: #6141b6;
-    --text-main: #FFFFFF;
-    --text-muted: #B0B0B0;
+    --text-color: #e0e0e0;
+    --text-main: rgb(203, 203, 203);
+    --text-dim: #B0B0B0;
     --border-radius: 12px;
     --header-height: 60px;
     --divider-color: #131313;
@@ -48,18 +49,13 @@ header {
     align-items: center;
     gap: 12px;
     font-size: 1.2rem;
-    font-weight: 600;
 }
 
-.logo-icon {
-    width: 26px;
-    height: 26px;
-    background-color: var(--text-color);
-    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>');
-    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>');
-    mask-repeat: no-repeat;
+.logo-image {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
 }
-
 /* Desktop Navigation */
 nav {
     display: flex;
@@ -70,14 +66,13 @@ nav a {
     color: var(--text-main);
     text-decoration: none;
     margin-left: 24px;
-    font-size: 0.9rem;
     font-weight: 500;
-    opacity: 0.8;
     transition: opacity 0.2s;
+
 }
 
 nav a:hover {
-    opacity: 1;
+    opacity: 0.7;
 }
 
 /* Menu Button (Hidden on Desktop) */
@@ -115,7 +110,7 @@ nav a:hover {
 
     .logo-area {
         font-family: 'Consolas', sans-serif;
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 
     .menu-toggle {

@@ -1,7 +1,4 @@
-
 :root {
-
-    --text-color: #e0e0e0;
     --btn-bg: #333;
     --btn-hover: #444;
     --input-bg: #2d2d2d;
@@ -102,10 +99,20 @@ button {
 
 button:hover { opacity: 0.8; }
 
-.btn-get { background-color: #4a4a4a; }
-.btn-post { background-color: var(--accent-purple); color: var(--text-color); }
-.btn-red { background-color: #cf6679; color: black; }
-.btn-action { background-color: var(--accent-purple); color: var(--text-color); }
+.btn-get {
+    background-color: #4a4a4a;
+}
+.btn-post {
+    background: linear-gradient(45deg, var(--accent-purple), var(--accent-purple-bright));
+    color: var(--text-color);
+}
+.btn-red {
+    background-color: #cf6679; color: black;
+}
+.btn-action {
+    background: linear-gradient(45deg, var(--accent-purple), var(--accent-purple-bright));
+    color: var(--text-color);
+}
 
 #responseOutput {
     font-family: 'Consolas', monospace;
