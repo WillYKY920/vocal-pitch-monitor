@@ -132,3 +132,54 @@ button:hover { opacity: 0.8; }
     line-height: 1.4;
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
+@media (max-width: 768px) {
+    .page-container {
+        /* Change from a rigid side-by-side grid to a single column layout */
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr; /* Controls take up space they need, response takes the rest */
+        grid-template-areas:
+      "header"
+      "controls"
+      "response";
+
+        /* Allow the whole page to scroll on mobile instead of strictly cutting it off at 92vh */
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .control-panel {
+        /* Remove fixed height so it can push the response panel down naturally */
+        height: auto;
+        overflow-y: visible; /* Let the main container handle the scrolling */
+        padding: 0;
+    }
+
+    .response-panel {
+        /* Give the response panel a minimum height so it's readable on mobile */
+        min-height: 400px;
+        margin-top: 20px; /* Separate it visually from the controls */
+    }
+
+    /* Adjust internal card elements for smaller screens */
+    .card {
+        padding: 15px;
+    }
+
+    .btn-group {
+        /* Stack buttons vertically if the screen is very small to avoid squishing text */
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* Make file upload inputs and their buttons stack neatly */
+    .form-group > div[style*="display:flex"] {
+        flex-direction: column;
+    }
+
+    .form-group > div[style*="display:flex"] button {
+        width: 100% !important; /* Override the inline style width */
+        margin-top: 5px;
+    }
+}

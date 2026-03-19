@@ -526,10 +526,10 @@ main {
     }
 
     main {
-        padding: 12px;
+        padding: 0;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 2px;
         height: auto;
         min-height: 100vh;
     }
@@ -539,6 +539,8 @@ main {
         flex-direction: column;
         gap: 8px;
         height: auto;
+        padding: 5px;
+
     }
 
     .ui-frame.left-frame {
@@ -547,8 +549,9 @@ main {
 
     /* Component Adjustments */
     .pitch-graph-container {
-        height: 560px;
+        height: 570px;
         flex-shrink: 0;
+        border-radius: 0;
     }
 
     .mic-select-wrapper {
@@ -556,24 +559,13 @@ main {
     }
 
     .ui-frame.right-frame {
-        height: 180px;
+        height: 100px;
         flex-shrink: 0;
         order: 1;
     }
 
     .waveform-visualizer-area {
-        flex: 1;
-        min-height: 0;
-    }
-
-    .waveform-indicator-bar {
-        top: 10px;
-        bottom: 10px;
-    }
-
-    /* Lyrics Adjustments */
-    .lyrics-area {
-        flex: 2;
+        display: none;
     }
 
     .lyric-line.active {
@@ -597,7 +589,7 @@ main {
     }
 
     .track-info h4 {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
     }
 
     .track-info span {
@@ -607,7 +599,7 @@ main {
     /* Selection List Adjustments */
     .selection-area {
         order: 3;
-        min-height: 200px;
+        min-height: 300px;
         display: flex;
         flex-direction: column;
         background-color: var(--card-bg);
@@ -615,10 +607,14 @@ main {
     }
 
     .list-headers {
-        font-size: 0.8rem;
         padding: 8px 0;
         border-radius: 12px 12px 0 0;
         grid-template-columns: 0.6fr 1.2fr;
+        font-size: 0.9rem;
+    }
+
+    .lang-select {
+        font-size: 0.9rem;
     }
 
     .list-content {
@@ -638,5 +634,6 @@ main {
 
     #monitor-container {
         border-width: 2px;
+        border-radius: 0;
     }
 }

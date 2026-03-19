@@ -1,12 +1,9 @@
-<script setup>
-</script>
-
 <template>
-  <div id="app">
+  <div id="app" @scroll="handleScroll"> <!-- ADDED: Inline scroll listener -->
     <header>
       <div class="logo-area">
         <img src="./assets/images/icon.png" alt="Vocal Pitch Monitor Logo" class="logo-image" />
-        <span>Vocal Pitch Monitor</span>
+        <img src="./assets/images/vpm.png" alt="Vocal Pitch Monitor" class="logo-text" />
       </div>
 
       <button class="menu-toggle" @click="toggleMenu" aria-label="Toggle menu">
@@ -43,12 +40,22 @@ export default {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
     },
     closeMenu() {
-      this.isMobileMenuOpen = false;
+      if (this.isMobileMenuOpen) {
+        this.isMobileMenuOpen = false;
+      }
+    },
+    handleScroll() {
+      this.closeMenu();
     }
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll, { passive: true });
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
   }
 };
 </script>
-
 
 <style>
 @import './assets/styles/header.css';

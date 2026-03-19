@@ -139,12 +139,61 @@
     border: 1px solid #444;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+    /* Reset the wrapper constraints for smaller screens */
+    .about-page-wrapper {
+        margin: 0; /* Remove negative margins on mobile */
+        width: 100%; /* Reset width */
+        height: 100%; /* Fit to available height */
+        padding: 20px 10px; /* Reduce outer padding */
+    }
+
+    .about-content {
+        width: 100%; /* Allow content to stretch */
+        padding: 0 10px;
+    }
+
+    /* Scale down the logo */
+    .app-logo {
+        width: 160px; /* Smaller logo for mobile */
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    .description {
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+        padding: 0 10px;
+    }
+
+    /* Force the info grid into a single column layout */
     .info-grid {
         grid-template-columns: 1fr;
+        gap: 10px; /* Tighter gap between items */
     }
+
     .full-width {
         grid-column: auto;
     }
-}
 
+    /* Adjust the inner boxes so the labels don't take up too much room */
+    .label {
+        width: 100px; /* Slightly narrower label box on mobile */
+        font-size: 0.85rem;
+        padding: 10px 12px;
+    }
+
+    .value {
+        font-size: 0.85rem;
+        padding: 10px 12px;
+    }
+
+    /* Make tags a bit more compact */
+    .contributor-tag {
+        padding: 4px 12px;
+        font-size: 0.85rem;
+    }
+}

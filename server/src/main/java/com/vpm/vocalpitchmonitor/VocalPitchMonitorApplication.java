@@ -28,5 +28,6 @@ public class VocalPitchMonitorApplication {
         SpringApplication.run(VocalPitchMonitorApplication.class, args);
 
         System.out.println("Application is running...");
+        System.out.println("port: 8080");
     }
 }

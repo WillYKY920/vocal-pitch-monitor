@@ -39,7 +39,7 @@ header {
     padding: 0 40px;
     border-bottom: 2px solid transparent;
     border-image: linear-gradient(to right, var(--accent-purple), var(--accent-purple-bright)) 1;
-    background-color: var(--bg-dark);
+    background: var(--bg-dark);
     position: relative;
     z-index: 100;
 }
@@ -48,12 +48,17 @@ header {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 1.2rem;
 }
 
 .logo-image {
-    width: 32px;
-    height: 32px;
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
+
+.logo-text {
+    height: 18px;
+    width: auto;
     object-fit: contain;
 }
 /* Desktop Navigation */
@@ -91,7 +96,7 @@ nav a:hover {
 .menu-toggle span {
     width: 30px;
     height: 3px;
-    background-color: var(--text-main);
+    background-color: var(--text-color);
     border-radius: 2px;
 }
 
@@ -110,7 +115,6 @@ nav a:hover {
 
     .logo-area {
         font-family: 'Consolas', sans-serif;
-        font-size: 1rem;
     }
 
     .menu-toggle {

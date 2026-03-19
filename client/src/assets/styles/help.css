@@ -139,3 +139,58 @@
     font-weight: 600;
     color: #ffb8b8; /* Soft red for warning emphasis */
 }
+@media (max-width: 768px) {
+    /* Reset the wrapper constraints for smaller screens */
+    .help-page-wrapper {
+        margin: 0; /* Remove negative margins on mobile */
+        width: 100%; /* Reset width to exactly the screen size */
+        height: 100%; /* Fit to available height */
+        padding: 20px 10px; /* Reduce outer padding */
+        border-radius: 0;
+    }
+
+    .help-content {
+        padding: 25px 20px; /* Reduce inner padding of the card */
+        margin-bottom: 20px;
+        border-radius: 8px; /* Slightly smaller border radius */
+        box-shadow: none; /* Flatten the design for mobile */
+    }
+
+    /* Scale down text sizes for mobile screens */
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .help-section h2 {
+        font-size: 1.5rem;
+    }
+
+    .help-section p {
+        font-size: 0.95rem;
+    }
+
+    /* Tweak the step guide boxes */
+    .step {
+        padding: 15px;
+    }
+
+    .step h3 {
+        font-size: 1.1rem;
+    }
+
+    .step p {
+        font-size: 0.9rem;
+    }
+
+    .declaration-box {
+        padding: 20px 15px;
+    }
+
+    .declaration-box h2 {
+        font-size: 1.3rem;
+    }
+}
