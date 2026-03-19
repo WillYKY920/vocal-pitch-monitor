@@ -1,5 +1,8 @@
 # Vocal Pitch Monitor Web Application
-This project is dedicated for developing a web-based platform for real-time vocal pitch monitoring, using signal processing and machine learning to make professional vocal training more accessible through objective feedback and personalized coaching.
+
+<div style="display: flex; justify-content: center;">
+  <img width="804" height="686" alt="aboutus" src="https://github.com/user-attachments/assets/137908f9-db2e-4c5a-9301-89e1e35eea6b" />
+</div>
 
 ## Usage Declaration
 This application is developed strictly for educational and training purposes. Its primary goal is to
