@@ -1,8 +1,7 @@
 # Vocal Pitch Monitor Web Application
-
-<div style="display: flex; justify-content: center;">
-  <img width="804" height="686" alt="aboutus" src="https://github.com/user-attachments/assets/137908f9-db2e-4c5a-9301-89e1e35eea6b" />
-</div>
+<p align="center">
+  <img width="600" alt="aboutus" src="https://github.com/user-attachments/assets/137908f9-db2e-4c5a-9301-89e1e35eea6b" />
+</p>
 
 ## Usage Declaration
 This application is developed strictly for educational and training purposes. Its primary goal is to
