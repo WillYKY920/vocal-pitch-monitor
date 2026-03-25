@@ -494,19 +494,99 @@ main {
     pointer-events: none;
     z-index: 5;
 }
+/* ==========================================================================
+   07. Show Pitch Result
+   ========================================================================== */
 
-.export-btn {
+/* Popup Container */
+.result-modal {
     position: absolute;
-    left: 50%;
     top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 24px;
-    width: 210px;
-    height: 80px;
+    width: 450px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--card-bg);
     border-radius: 12px;
-    background: linear-gradient(45deg, var(--accent-purple), var(--accent-purple-bright));
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     color: var(--text-color);
-    box-shadow: 0 4px 10px rgba(124, 77, 255, 0.3);
+    z-index: 100;
+}
+
+/* Header */
+.result-header {
+    display: flex;
+    flex-shrink: 0;
+    background: linear-gradient(45deg, var(--accent-purple), var(--accent-purple-bright));
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-weight: bold;
+
+}
+
+/* Rows Container */
+.result-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.result-body::-webkit-scrollbar {
+    width: 6px;
+}
+.result-body::-webkit-scrollbar-track {
+    background: #2b2b2b;
+}
+.result-body::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+.result-body::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+/* Row Styling */
+.result-row {
+    display: flex;
+    padding: 12px 14px;
+    font-size: 1rem;
+    align-items: center;
+}
+.result-row:nth-child(odd) {
+    background-color: var(--card-bg);
+}
+.result-row:nth-child(even) {
+    background-color: var(--card-bg-grey);
+}
+
+/* Columns */
+.col-lyrics {
+    flex: 1;
+    text-align: left;
+
+}
+.col-offkey {
+    width: 80px;
+    text-align: center;
+}
+
+/* Percentage Pills */
+.pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+.pill-med {
+    background-color: #d98888; /* Soft pink */
+}
+.pill-high {
+    background-color: #e54d4d; /* Bright red */
 }
 
 /* ==========================================================================

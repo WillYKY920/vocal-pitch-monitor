@@ -1,20 +1,16 @@
 // src/composables/usePitchMonitor.js
-
 import { ref, shallowRef, computed, onMounted, onUnmounted, watch } from 'vue'
 import { YinF0Detector } from '../algorithms/pitchDetector.js'
 import { AudioFilter } from '../algorithms/audioFilter.js'
 import { ErrorDetector } from '../algorithms/errorDetector.js'
 import { useAudioRecorder } from './useAudioRecorder.js'
 import { mapPitchesToNotes } from '../services/utils.js'
-import { buildPitchErrorsPayload, downloadJson } from './usePitchExport.js'
 
 export function usePitchCanvas(props, canvasRef) {
     // --- Export state ---
     const songEnded = ref(false)
     const exported = ref(false)
     const offKeyEvents = shallowRef([]) // [{timeMs, freq}]
-
-    const showExport = computed(() => songEnded.value && !exported.value)
 
     // --- Monitor state ---
     const currentNote = ref('')
@@ -137,7 +133,8 @@ export function usePitchCanvas(props, canvasRef) {
 
                 offKeyEvents.value.push({
                     timeMs: currentTime * 1000,
-                    freq: Number(smoothedFreq.toFixed(2))
+                    freq: Number(smoothedFreq.toFixed(2)),
+                    deviation: error.deviation // Add this line to store the deviation
                 })
             }
         } else {
@@ -363,14 +360,6 @@ export function usePitchCanvas(props, canvasRef) {
         ctx.value.setLineDash([])
     }
 
-    // --- Export ---
-    const exportJson = () => {
-        const payload = buildPitchErrorsPayload(offKeyEvents.value, props.lyrics)
-        const fileName = `pitch-errors-${Date.now()}.json`
-        downloadJson(payload, fileName)
-        exported.value = true
-    }
-
     const reset = () => {
         stop()
 
@@ -439,11 +428,10 @@ export function usePitchCanvas(props, canvasRef) {
         canvasRef,
         currentNote,
         isRunning,
-        showExport,
-
+        songEnded,      // Ensure this is exported
+        offKeyEvents,   // Ensure this is exported
         start,
         stop,
-        reset,
-        exportJson
+        reset
     }
 }
