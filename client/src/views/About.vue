@@ -13,7 +13,9 @@ const appInfo = {
 const contributors = [
   'WillYKY920',
   'LucasHau1113',
-  'kken0812kk'
+  'kken0812kk',
+  'jj',
+  'jasonYW'
 ]
 
 const logoUrl = './logo.png'

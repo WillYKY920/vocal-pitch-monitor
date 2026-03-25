@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue' // Imported computed
+import { ref, computed, onMounted } from 'vue'
 import { API } from '../services/api.js'
 import { formatTime } from '../services/utils.js'
 
@@ -60,10 +60,10 @@ const props = defineProps({
 
 const emit = defineEmits(['song-selected'])
 
-const artists = ref([]) // Now holds array of objects: { name: 'XX', lang: 'XX' }
+const artists = ref([])
 const songs = ref([])
 const selectedArtist = ref(null)
-const selectedLang = ref('all') // Default to 'all'
+const selectedLang = ref('all')
 
 const filteredArtists = computed(() => {
   if (selectedLang.value === 'all') return artists.value
@@ -75,7 +75,6 @@ const loadArtists = async () => {
   artists.value = data.artists || []
 }
 
-// Ensure this still expects the string name, which we pass from the template using artist.name
 const selectArtist = async (artistName) => {
   selectedArtist.value = artistName
   const data = await API.getSongsByArtist(artistName)

@@ -1,6 +1,19 @@
 // src/composables/usePitchResults.js
 import { computed } from 'vue'
 import { formatTime } from '../services/utils.js'
+/**
+ *
+ * computes the average pitch deviation for each line of lyrics based on recorded
+ * off-key events. It maps the events to specific lyric lines using timestamps and returns
+ * an array of formatted results only for the lines where pitch deviations occurred.
+ * The results are only evaluated once the song has ended.
+ *
+ * @param {import('vue').Ref<boolean>} songEnded - A reactive reference indicating whether the song has finished playing.
+ * @param {Object} props - The component properties.
+ * @param {Array<{timestamp: number, text: string}>} [props.lyrics] - An array of lyric objects containing timestamps (in milliseconds) and text.
+ * @param {import('vue').Ref<Array<{timeMs: number, deviation: number}>>} offKeyEvents - A reactive reference to an array of recorded off-key events, each containing a timestamp and a deviation value.
+ * @returns {{ pitchResults: import('vue').ComputedRef<Array<{timeStr: string, text: string, offKeyPercent: number}>> }} An object containing the `pitchResults` computed property.
+ */
 
 export function usePitchResults(songEnded, props, offKeyEvents) {
     const pitchResults = computed(() => {

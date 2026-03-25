@@ -1,5 +1,5 @@
 /**
- * A utility class designed to smooth raw pitch data and correct common tracking artifacts,
+ * smooth raw pitch data and correct common tracking artifacts,
  * specifically octave jumps that frequently occur with the YIN pitch detection algorithm.
  */
 export class AudioFilter {

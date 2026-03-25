@@ -1,5 +1,5 @@
 /**
- * A class responsible for analyzing a user's live pitch against a pre-loaded reference vocal track.
+ * responsible for analyzing a user's live pitch against a pre-loaded reference vocal track.
  * It calculates moving averages of both the user's pitch and the reference pitch over a specific window size,
  * and flags an error if the percentage deviation exceeds a defined threshold.
  */
