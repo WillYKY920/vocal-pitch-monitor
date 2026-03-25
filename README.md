@@ -26,7 +26,8 @@ Users are expected to utilize obtained audio files ONLY for their practice sessi
 * **Database Schema (PostgreSQL)** <img width="3208" height="1968" alt="database" src="https://github.com/user-attachments/assets/b493347c-0254-46f8-ba9e-74105110c7c1" />
 1. Manages relational metadata, linking Artist and Song tables to audio, vocal, and lyric components via foreign key dependencies.
 ## Web Application UI
-![ui](img/desktop-ui.png)
+<img width="1911" height="959" alt="image" src="https://github.com/user-attachments/assets/e0dceafc-8a9f-4917-8d2c-592af916d1b7" />
+
 > Features real-time pitch detection with a dynamic frequency graph, pitch note overlays, and an audio waveform visualizer, alongside playback controls for selecting artists and songs
 
 ## Setup
