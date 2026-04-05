@@ -11,6 +11,7 @@ export function usePitchCanvas(props, canvasRef) {
     const songEnded = ref(false)
     const exported = ref(false)
     const offKeyEvents = shallowRef([]) // [{timeMs, freq}]
+    const rawAudioChunks = shallowRef([])
 
     // --- Monitor state ---
     const currentNote = ref('')
@@ -103,10 +104,13 @@ export function usePitchCanvas(props, canvasRef) {
     // --- Audio processing ---
     const processAudio = (inputData) => {
         if (!isRunning.value) return
+        const currentTime = props.audioElement ? props.audioElement.currentTime : (Date.now() / 1000)
 
-        const currentTime = props.audioElement
-            ? props.audioElement.currentTime
-            : (Date.now() / 1000)
+        // Store a copy of the input buffer with its timestamp in milliseconds
+        rawAudioChunks.value.push({
+            timeMs: currentTime * 1000,
+            data: new Float32Array(inputData)
+        })
 
         let frequency = 0
         if (yinDetector.value) {
@@ -366,6 +370,7 @@ export function usePitchCanvas(props, canvasRef) {
         historyData.value.length = 0
         errorMarkers.value.length = 0
         offKeyEvents.value.length = 0
+        rawAudioChunks.value = []
 
         songEnded.value = false
         exported.value = false
@@ -432,6 +437,8 @@ export function usePitchCanvas(props, canvasRef) {
         offKeyEvents,   // Ensure this is exported
         start,
         stop,
-        reset
+        reset,
+        rawAudioChunks,
+        sampleRate
     }
 }
