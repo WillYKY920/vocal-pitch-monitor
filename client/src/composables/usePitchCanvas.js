@@ -1,8 +1,8 @@
 // src/composables/usePitchMonitor.js
 import { ref, shallowRef, computed, onMounted, onUnmounted, watch } from 'vue'
-import { YinF0Detector } from '../algorithms/pitchDetector.js'
-import { AudioFilter } from '../algorithms/audioFilter.js'
-import { ErrorDetector } from '../algorithms/errorDetector.js'
+import { YinF0Detector } from '../cores/pitchDetector.js'
+import { AudioFilter } from '../cores/audioFilter.js'
+import { ErrorDetector } from '../cores/errorDetector.js'
 import { useAudioRecorder } from './useAudioRecorder.js'
 import { mapPitchesToNotes } from '../services/utils.js'
 

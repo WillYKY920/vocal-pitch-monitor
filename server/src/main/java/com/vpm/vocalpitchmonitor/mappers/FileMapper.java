@@ -50,12 +50,10 @@ public class FileMapper {
     }
 
     public Audiotrack toAudiotrack(MultipartFile audioTrackFile, int songId) throws IOException, EntityNotFoundException {
-
         Song song = songRepository.findById(songId)
                 .orElseThrow(() -> new EntityNotFoundException("Song not found with id: " + songId));
 
         Audiotrack entity = new Audiotrack();
-
         entity.setFileName(audioTrackFile.getOriginalFilename());
         entity.setByteSize(audioTrackFile.getSize());
         entity.setAudioData(audioTrackFile.getBytes());

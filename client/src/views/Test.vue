@@ -102,8 +102,8 @@
 
 <script setup>
 import { ref, onUnmounted } from 'vue';
-import { YinF0Detector } from '../algorithms/pitchDetector.js';
-import { AudioFilter } from '../algorithms/audioFilter.js';
+import { YinF0Detector } from '../cores/pitchDetector.js';
+import { AudioFilter } from '../cores/audioFilter.js';
 import { useAudioRecorder } from '../composables/useAudioRecorder.js';
 
 // --- Configuration ---

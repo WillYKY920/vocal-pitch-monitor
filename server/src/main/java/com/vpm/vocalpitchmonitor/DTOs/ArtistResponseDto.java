@@ -5,9 +5,7 @@ import java.util.List;
 public record ArtistResponseDto(
 
         String name,
-
         List<SongResponseDto> songs
-
 ){
 
 }
