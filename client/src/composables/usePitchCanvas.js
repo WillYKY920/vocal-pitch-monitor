@@ -92,7 +92,7 @@ export function usePitchCanvas(props, canvasRef) {
             canvasRef.value.height = parent.clientHeight
         }
         maxHistoryLen.value = MAX_HISTORY
-        if (!isRunning.value) draw()
+        if (!isRunning.value) drawPitchGraph()
     }
 
     let resizeTimeout = null
@@ -106,23 +106,19 @@ export function usePitchCanvas(props, canvasRef) {
         if (!isRunning.value) return
         const currentTime = props.audioElement ? props.audioElement.currentTime : (Date.now() / 1000)
 
-        // Store a copy of the input buffer with its timestamp in milliseconds
         rawAudioChunks.value.push({
             timeMs: currentTime * 1000,
             data: new Float32Array(inputData)
         })
-
         let frequency = 0
         if (yinDetector.value) {
             frequency = yinDetector.value.estimateF0(inputData)
         }
-
         let smoothedPitch = null
         if (frequency > MIN_FREQ && frequency < MAX_FREQ) {
             const rawMidi = 69 + 12 * Math.log2(frequency / 440)
             smoothedPitch = audioFilter.value.process(rawMidi)
         }
-
         if (smoothedPitch !== null) {
             const smoothedFreq = 440 * Math.pow(2, (smoothedPitch - 69) / 12)
             latestDetectedNote = YinF0Detector.frequencyToNote(smoothedFreq)
@@ -138,7 +134,7 @@ export function usePitchCanvas(props, canvasRef) {
                 offKeyEvents.value.push({
                     timeMs: currentTime * 1000,
                     freq: Number(smoothedFreq.toFixed(2)),
-                    deviation: error.deviation // Add this line to store the deviation
+                    deviation: error.deviation
                 })
             }
         } else {
@@ -147,14 +143,12 @@ export function usePitchCanvas(props, canvasRef) {
             }
             historyData.value.push({ val: null, time: currentTime, active: false })
         }
-
         if (historyData.value.length > maxHistoryLen.value) historyData.value.shift()
 
         const retentionTime = 10
         if (historyData.value.length > 0 && (currentTime - historyData.value[0].time > retentionTime)) {
             historyData.value.shift()
         }
-
         errorDetector.value.clearOldErrors(10000)
     }
 
@@ -198,7 +192,7 @@ export function usePitchCanvas(props, canvasRef) {
 
         const now = performance.now()
         if (now - lastDrawTime.value >= DRAW_INTERVAL) {
-            draw()
+            drawPitchGraph()
             lastDrawTime.value = now
         }
 
@@ -206,7 +200,7 @@ export function usePitchCanvas(props, canvasRef) {
     }
 
     // --- Drawing ---
-    const draw = () => {
+    const drawPitchGraph = () => {
         if (!ctx.value || !canvasRef.value) return
 
         const { width, height } = canvasRef.value
@@ -386,7 +380,7 @@ export function usePitchCanvas(props, canvasRef) {
 
         if (ctx.value && canvasRef.value) {
             ctx.value.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
-            draw()
+            drawPitchGraph()
         }
     }
 

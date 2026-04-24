@@ -13,7 +13,7 @@
 class RecorderProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
-        this.bufferSize = 1024; // Strictly match ScriptProcessor size
+        this.bufferSize = 1024;
         this.buffer = new Float32Array(this.bufferSize);
         this.bytesWritten = 0;
     }
@@ -34,7 +34,6 @@ class RecorderProcessor extends AudioWorkletProcessor {
         const channelData = input[0];
         if (!channelData) return true;
 
-        // Accumulate 128-frame chunks into 1024-frame chunks
         for (let i = 0; i < channelData.length; i++) {
             this.buffer[this.bytesWritten++] = channelData[i];
 

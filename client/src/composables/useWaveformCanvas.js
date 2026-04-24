@@ -27,7 +27,7 @@ export function useWaveformCanvas(canvasRef) {
     /**
      * Renders the amplitude history onto the canvas as a series of scrolling vertical bars.
      */
-    const drawGraph = () => {
+    const drawWaveform = () => {
         if (!ctx.value || !canvasRef.value) return
         const width = canvasRef.value.width
         const height = canvasRef.value.height
@@ -78,7 +78,6 @@ export function useWaveformCanvas(canvasRef) {
         for (let i = 0; i < inputData.length; i++) {
             sum += inputData[i] * inputData[i]
         }
-
         const rms = Math.sqrt(sum / inputData.length)
         const displayValue = Math.min(rms * 10, 1.0)
 
@@ -87,12 +86,10 @@ export function useWaveformCanvas(canvasRef) {
             value: rms,
             display: displayValue
         })
-
         if (amplitudeHistory.value.length > maxHistory) {
             amplitudeHistory.value.shift()
         }
-
-        drawGraph()
+        drawWaveform()
     }
 
     const start = async (audioContext, sourceNode) => {
@@ -120,7 +117,7 @@ export function useWaveformCanvas(canvasRef) {
 
     const clear = () => {
         amplitudeHistory.value = []
-        drawGraph()
+        drawWaveform()
     }
 
     const reset = () => {
@@ -132,7 +129,7 @@ export function useWaveformCanvas(canvasRef) {
         if (canvasRef.value) {
             ctx.value = canvasRef.value.getContext('2d')
             resizeCanvas()
-            drawGraph()
+            drawWaveform()
         }
     })
 

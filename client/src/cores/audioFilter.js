@@ -41,7 +41,6 @@ export class AudioFilter {
 
         const diff = midiFloat - this.lastValidPitch;
         const absDiff = Math.abs(diff);
-
         // If jump is close to 1 octave (11-13 semitones)
         if (absDiff >= 11 && absDiff <= 13) {
             return diff > 0 ? midiFloat - 12 : midiFloat + 12;
@@ -50,7 +49,6 @@ export class AudioFilter {
         else if (absDiff >= 23 && absDiff <= 25) {
             return diff > 0 ? midiFloat - 24 : midiFloat + 24;
         }
-
         return midiFloat;
     }
 

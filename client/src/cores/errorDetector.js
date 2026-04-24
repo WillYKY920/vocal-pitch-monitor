@@ -65,7 +65,6 @@ export class ErrorDetector {
                 count++;
             }
         }
-
         return count > 0 ? sum / count : 0;
     }
 
@@ -129,7 +128,6 @@ export class ErrorDetector {
         if (userMean === 0 || sampleMean === 0) {
             return null;
         }
-
         // Calculate deviation percentage
         const deviation = Math.abs(userMean - sampleMean) / sampleMean;
 
