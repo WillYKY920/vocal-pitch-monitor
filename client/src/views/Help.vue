@@ -26,17 +26,18 @@
         </p>
 
         <div class="step-guide">
+
           <div class="step">
-            <h3>1. Select Your Track</h3>
+            <h3>1. Set Up Your Microphone</h3>
             <p>
-              In the bottom-left panel, you will find our music library. Start by browsing the <strong>Artists</strong> list and click on one to reveal their available tracks under the <strong>Songs</strong> column. Selecting a song will load it into the player.
+              Before you start singing, ensure your microphone is properly connected. Look for the microphone icon in the bottom control bar. Use the dropdown menu next to it to select your preferred input device (e.g., your default desktop microphone or an external audio interface).
             </p>
           </div>
 
           <div class="step">
-            <h3>2. Set Up Your Microphone</h3>
+            <h3>2. Select Your Track</h3>
             <p>
-              Before you start singing, ensure your microphone is properly connected. Look for the microphone icon in the bottom control bar. Use the dropdown menu next to it to select your preferred input device (e.g., your default desktop microphone or an external audio interface).
+              In the bottom-left panel, you will find our music library. Start by browsing the <strong>Artists</strong> list and click on one to reveal their available tracks under the <strong>Songs</strong> column. Selecting a song will load it into the player.
             </p>
           </div>
 
